@@ -1,7 +1,10 @@
 from django.shortcuts import render
-from django.views.generic.base import TemplateView
+from rest_framework import generics
+
+from .models import Tasks
+from .serializers import TasksSerializer
 
 
-# Create your views here.
-class Home(TemplateView):
-    template_name = 'listTasks/home.html'
+class ListTasks(generics.ListAPIView):
+    queryset = Tasks.objects.all()
+    serializer_class = TasksSerializer
