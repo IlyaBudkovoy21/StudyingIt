@@ -4,5 +4,5 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.ListTasks.as_view(), name='tasks'),
+    path('<str:cat>/all/', views.ListTasks.as_view(), name='tasks')
 ]

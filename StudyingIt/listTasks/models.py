@@ -2,16 +2,16 @@ from django.db import models
 
 
 class Types(models.Model):
-    typeTask = models.CharField(max_length=30)
+    catTask = models.CharField(max_length=30)
 
     def __str__(self):
-        return self.typeTask
+        return self.catTask
 
 
 class Tasks(models.Model):
     name = models.CharField(max_length=50)
     desc = models.TextField(max_length=1000)
-    type_id = models.ForeignKey(Types, on_delete=models.PROTECT)
+    cat = models.ForeignKey(Types, on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name
