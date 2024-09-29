@@ -3,8 +3,8 @@ services:
        image: postgres:latest
        container_name: postgres_db
        environment:
-         POSTGRES_USER: DB_USER
-         POSTGRES_PASSWORD: DB_PASSWORD
+         POSTGRES_USER: ${DB_USER}
+         POSTGRES_PASSWORD: ${DB_PASSWORD}
          POSTGRES_DB: mydatabase
        ports:
          - "5432:5432"
