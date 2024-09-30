@@ -9,7 +9,7 @@ class ListTasksByCat(generics.ListAPIView):
     serializer_class = TasksSerializer
 
     def get_queryset(self):
-        return Tasks.objects.filter(cat=self.kwargs.get('cat'))
+        return Tasks.objects.filter(cat_id=self.kwargs.get('cat'))
 
 
 class AllTasks(generics.ListAPIView):
