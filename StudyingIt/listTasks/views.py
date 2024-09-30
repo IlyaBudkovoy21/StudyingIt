@@ -2,14 +2,14 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 
 from .models import Tasks
-from .serializers import TasksSerializer, AddTaskSerializer
+from .serializers import TasksSerializer
 
 
 class ListTasksByCat(generics.ListAPIView):
     serializer_class = TasksSerializer
 
     def get_queryset(self):
-        return Tasks.objects.filter(cat_id=self.kwargs.get('cat'))
+        return Tasks.objects.filter(cat=self.kwargs.get('cat'))
 
 
 class AllTasks(generics.ListAPIView):
@@ -29,5 +29,4 @@ class OneTask(generics.RetrieveAPIView):
 
 class AddTask(generics.ListCreateAPIView):
     queryset = Tasks.objects.all()
-    serializer_class = AddTaskSerializer
-
+    serializer_class = TasksSerializer
