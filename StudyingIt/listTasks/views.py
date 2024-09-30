@@ -1,9 +1,8 @@
-from django.shortcuts import render
-from rest_framework import generics
-from rest_framework.views import APIView
+from rest_framework import generics, status
+from rest_framework.response import Response
+
 from .models import Tasks
-from .serializers import TasksSerializer
-from django.db.models import Q
+from .serializers import TasksSerializer, AddTaskSerializer
 
 
 class ListTasksByCat(generics.ListAPIView):
@@ -26,3 +25,9 @@ class OneTask(generics.RetrieveAPIView):
 
     def get_queryset(self):
         return Tasks.objects.all()
+
+
+class AddTask(generics.ListCreateAPIView):
+    queryset = Tasks.objects.all()
+    serializer_class = AddTaskSerializer
+

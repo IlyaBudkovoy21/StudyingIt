@@ -11,7 +11,7 @@ class Types(models.Model):
 class Tasks(models.Model):
     name = models.CharField(max_length=50)
     desc = models.TextField(max_length=1000)
-    cat = models.ForeignKey(Types, on_delete=models.PROTECT)
+    cat = models.CharField(max_length=15)
 
     def __str__(self):
         return self.name
