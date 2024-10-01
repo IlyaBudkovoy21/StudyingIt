@@ -11,7 +11,7 @@ class ListTasksByCat(generics.ListAPIView):
     def get_queryset(self):
         queryset = Tasks.objects.all()
         filter_param = self.kwargs['cat']
-        queryset = queryset.filter(cat__id=filter_param)
+        queryset = queryset.filter(cat_id=filter_param)
         return queryset
 
 
