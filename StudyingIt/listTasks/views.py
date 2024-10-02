@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics, viewsets, mixins
 from rest_framework.response import Response
 
 from .models import Tasks
@@ -15,17 +15,9 @@ class ListTasksByCat(generics.ListAPIView):
         return queryset
 
 
-class OneTask(generics.RetrieveAPIView):
-    serializer_class = TasksSerializer
-    lookup_url_kwarg = 'seq_num'
-    queryset = Tasks.objects.all()
-
-
-class AllTasks(generics.ListAPIView):
-    serializer_class = TasksSerializer
-    queryset = Tasks.objects.all()
-
-
-class AddTask(generics.ListCreateAPIView):
+class TasksCreateListViewsSet(mixins.ListModelMixin,
+                              mixins.CreateModelMixin,
+                              mixins.RetrieveModelMixin,
+                              viewsets.GenericViewSet):
     queryset = Tasks.objects.all()
     serializer_class = TasksSerializer
