@@ -15,20 +15,15 @@ class ListTasksByCat(generics.ListAPIView):
         return queryset
 
 
-
-class AllTasks(generics.ListAPIView):
-    serializer_class = TasksSerializer
-
-    def get_queryset(self):
-        return Tasks.objects.all()
-
-
 class OneTask(generics.RetrieveAPIView):
     serializer_class = TasksSerializer
     lookup_url_kwarg = 'seq_num'
+    queryset = Tasks.objects.all()
 
-    def get_queryset(self):
-        return Tasks.objects.all()
+
+class AllTasks(generics.ListAPIView):
+    serializer_class = TasksSerializer
+    queryset = Tasks.objects.all()
 
 
 class AddTask(generics.ListCreateAPIView):
