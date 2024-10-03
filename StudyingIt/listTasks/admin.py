@@ -10,8 +10,7 @@ class TasksAdmin(admin.ModelAdmin):
     list_editable = ('name', 'cat')
     list_per_page = 20
     search_fields = ['name', 'id']
-    list_filter = ['cat',]
-
+    list_filter = ['cat', ]
 
 
 @admin.register(Types)
