@@ -8,7 +8,7 @@ from .serializers import UserSerializer
 
 class Registration(APIView):
     def post(self, request):
-        serializer = UserSerializer(request.data)
+        serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
@@ -21,6 +21,7 @@ class Registration(APIView):
                 "refresh": str(refresh),
                 "access": str(refresh.access_token),
             }, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_302_FOUND)
 
 
 class Login(APIView):
