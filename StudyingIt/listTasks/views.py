@@ -1,6 +1,5 @@
 from rest_framework import generics, viewsets, mixins
-from rest_framework.response import Response
-
+from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticated
 from .models import Tasks
 from .serializers import TasksSerializer
 
@@ -15,9 +14,17 @@ class ListTasksByCat(generics.ListAPIView):
         return queryset
 
 
-class TasksCreateListViewsSet(mixins.ListModelMixin,
-                              mixins.CreateModelMixin,
-                              mixins.RetrieveModelMixin,
-                              viewsets.GenericViewSet):
+class TasksRetrieveListViewsSet(mixins.ListModelMixin,
+                                mixins.RetrieveModelMixin,
+                                viewsets.GenericViewSet):
     queryset = Tasks.objects.all()
     serializer_class = TasksSerializer
+    permission_classes = [AllowAny]
+
+
+class CreateDestroyViewSet(mixins.CreateModelMixin,
+                           mixins.DestroyModelMixin,
+                           viewsets.GenericViewSet):
+    queryset = Tasks.objects.all()
+    serializer_class = TasksSerializer
+    permission_classes = [IsAdminUser]
