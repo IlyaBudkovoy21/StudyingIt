@@ -1,5 +1,5 @@
 from rest_framework import generics, viewsets, mixins
-from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAdminUser, AllowAny
 from .models import Tasks
 from .serializers import TasksSerializer
 
