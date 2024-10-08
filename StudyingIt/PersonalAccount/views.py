@@ -28,7 +28,7 @@ class Login(APIView):
     def post(self, request):
         data = request.data
         username = data.get("username", None)
-        password = data.get("username", None)
+        password = data.get("password", None)
         if username is None or password is None:
             return Response(
                 {"error": "Нужен логин и пароль"},
