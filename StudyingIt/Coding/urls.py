@@ -3,5 +3,6 @@ from . import views
 
 
 urlpatterns = [
-    path('<str:name>/', views.ReturnTask.as_view()),
+    path("checkTask/", views.SaveCode.as_view()),
+    path('<str:name>/', views.ReturnTask.as_view())
 ]
