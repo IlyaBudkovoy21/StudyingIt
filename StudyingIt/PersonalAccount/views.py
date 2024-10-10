@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializer
+from rest_framework.permissions import IsAuthenticated
 
 
 class Registration(APIView):
@@ -53,6 +54,8 @@ class Login(APIView):
 
 
 class Logout(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         refresh_token = request.data.get("refresh_token")
         if not refresh_token:
