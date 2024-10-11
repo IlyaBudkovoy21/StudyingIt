@@ -1,5 +1,5 @@
 import os
-
+from .s3 import client
 import boto3
 import botocore.exceptions
 from rest_framework import generics, status
@@ -31,11 +31,10 @@ class SaveCode(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        client = boto3.client("s3", aws_access_key_id=os.getenv("ACCESS_KEY_AWS"),
-                              aws_secret_access_key=os.getenv("ACCESS_KEY_AWS"),
-                              region_name='ru-1')
+        file = f'{request.data.get("username")}-test'
         try:
-            client.put_object(Bucket=os.getenv("BUCKET_NAME"), Key="client1/code1.txt", Body=request.data['code'])
+            client.upload_file(file, request.data.get("username"), request.data.get("code"))
             print("Файл загружен")
         except botocore.exceptions.NoCredentialsError:
             print("Ошибка отправки")
+        return Response({"success": "Add code file"})
