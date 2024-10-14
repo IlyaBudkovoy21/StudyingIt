@@ -37,4 +37,11 @@ class SaveCode(APIView):
             print("Файл загружен")
         except botocore.exceptions.NoCredentialsError:
             print("Ошибка отправки")
-        return Response({"success": "Add code file"})
+        cl = client.get_client()
+        url = cl.generate_presigned_url(
+            'get_object',
+            ExpiresIn=2592000,
+            Params={"Bucket": os.getenv("BUCKET_NAME"),
+                    "Key": file}
+        )
+        return Response({"Code": url})
