@@ -4,9 +4,8 @@ from .models import Tasks
 
 
 class TasksSerializer(serializers.ModelSerializer):
+    hash_name = serializers.SlugField()
+
     class Meta:
         model = Tasks
-        fields = ('name', 'desc', 'cat')
-
-
-
+        fields = "__all__"
