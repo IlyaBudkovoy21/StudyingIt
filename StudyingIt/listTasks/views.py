@@ -41,7 +41,9 @@ class FilterTasksByManyCats(APIView):
     def post(self,request):
         filter_param = request.data.get("cat")
         if not filter_param:
-            return Response({"error":"no filter"})
+            filtered_queryset=Tasks.objects.all()
+            serializer = self.serializer_class(filtered_queryset, many=True)
+            return Response(serializer.data)
         
         query = Q()
         for cat in filter_param:
