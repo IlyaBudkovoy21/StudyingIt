@@ -4,5 +4,5 @@ from . import views
 
 urlpatterns = [
     path("checkTask/", views.SaveCode.as_view()),
-    path('<str:namex>/', views.ReturnTask.as_view())
+    path('<slug:name>/', views.ReturnTask.as_view())
 ]
