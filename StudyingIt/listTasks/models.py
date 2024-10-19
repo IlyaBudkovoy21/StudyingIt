@@ -11,7 +11,7 @@ class Types(models.Model):
 
 
 class Tasks(models.Model):
-    name = models.CharField(max_length=50, verbose_name='Имя задачки')
+    name = models.CharField(max_length=50, verbose_name='Имя задачки', unique=True)
     desc = models.TextField(max_length=1000)
     cat = models.ForeignKey(Types, on_delete=models.CASCADE, blank=False, default=0, null=False)
     hash_name = models.SlugField(editable=False, null=False)
