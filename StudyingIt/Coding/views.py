@@ -12,6 +12,7 @@ import listTasks.models
 import io
 from rest_framework.parsers import JSONParser
 from listTasks.models import Tasks
+import requests
 
 
 class ReturnTask(generics.RetrieveAPIView):
@@ -44,4 +45,10 @@ class SaveCode(APIView):
             Params={"Bucket": os.getenv("BUCKET_NAME"),
                     "Key": file}
         )
-        return Response({"Code": url})
+        response = requests.post("http://localhost:1234/code", data={"link": url,
+                                                                     "lang": request.data.lang,
+                                                                     "task_name": request.data.name_task})
+        if response.status_code == 200:
+            return Responce({"correct": "Success data transfer"})
+        else:
+            return Responce({"uncorrect": f"Unsuccess data transfer with status code -> {response.status_code}"})
