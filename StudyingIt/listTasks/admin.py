@@ -4,7 +4,7 @@ from .models import Types, Tasks
 
 @admin.register(Tasks)
 class TasksAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'cat')
+    list_display = ('id', 'name', 'cat', 'hash_name')
     list_display_links = ('id',)
     ordering = ('cat_id',)
     list_editable = ('name', 'cat')

@@ -131,6 +131,9 @@ REST_FRAMEWORK = {
     )
 }
 
+AWS_ACCESS_KEY_ID = os.getenv("ACCESS_KEY_AWS")
+AWS_SECRET_ACCESS_KEY = os.getenv("SECRET_KEY_AWS")
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),

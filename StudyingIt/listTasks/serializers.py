@@ -1,12 +1,17 @@
 from rest_framework import serializers
+from .models import Tasks, CodePatterns
 
-from .models import Tasks
+
+class PatternSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CodePatterns
+        fields = "__all__"
 
 
 class TasksSerializer(serializers.ModelSerializer):
+    hash_name = serializers.SlugField(required=False)
+    patterns = PatternSerializer()
+
     class Meta:
         model = Tasks
-        fields = ('name', 'desc', 'cat')
-
-
-
+        fields = "__all__"
