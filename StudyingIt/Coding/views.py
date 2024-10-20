@@ -39,15 +39,10 @@ class SaveCode(APIView):
         except botocore.exceptions.NoCredentialsError:
             print("Ошибка отправки")
         cl = client.get_client()
-        url = cl.generate_presigned_url(
-            'get_object',
-            ExpiresIn=2592000,
-            Params={"Bucket": os.getenv("BUCKET_NAME"),
-                    "Key": file}
-        )
-        response = requests.post("http://localhost:1234/code", data={"link": url,
-                                                                     "lang": request.data.lang,
-                                                                     "task_name": request.data.name_task})
+        response = requests.post("http://localhost:1234/code", data={"path": f"{request.data.get("username")}-folder/{request.data.get("username")}-test",
+                                                                     "lang": request.data.get("lang"),
+                                                                     "task_name": request.data.get("name_task"),
+                                                                     "username": request.data.get("username")})
         if response.status_code == 200:
             return Responce({"correct": "Success data transfer"})
         else:
