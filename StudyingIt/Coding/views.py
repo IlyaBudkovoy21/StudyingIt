@@ -44,6 +44,6 @@ class SaveCode(APIView):
             "task_name": request.data.get("task_name"),
             "username": request.data.get("username")})
         if response.status_code == 200:
-            return Responce({"correct": "Success data transfer"})
+            return Response({"correct": "Success data transfer"})
         else:
-            return Responce({"uncorrect": f"Unsuccess data transfer with status code -> {response.status_code}"})
+            return Response({"uncorrect": f"Unsuccess data transfer with status code -> {response.status_code}"})
