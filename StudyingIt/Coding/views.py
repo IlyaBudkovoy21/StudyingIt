@@ -16,7 +16,6 @@ import requests
 
 
 class ReturnTask(generics.RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
     serializer_class = listTasks.serializers.TasksSerializer
 
     def get_queryset(self):
@@ -36,15 +35,9 @@ class SaveCode(APIView):
         try:
             client.upload_file(file, request.data.get("username"), request.data.get("code"),
                                request.data.get("task_name"))
-            print("Файл загружен")
         except botocore.exceptions.NoCredentialsError:
-            print("Ошибка отправки")
+            raise Exception("Ошибка отправки сообщения")
         cl = client.get_client()
-        print({
-            "path": f"{request.data.get("task_name")}-folder/{request.data.get("username")}-folder/{request.data.get("username")}-test",
-            "lang": request.data.get("lang"),
-            "task_name": request.data.get("task_name"),
-            "username": request.data.get("username")})
         response = requests.post("http://localhost:1234/code", data={
             "path": f"{request.data.get("task_name")}-folder/{request.data.get("username")}-folder/{request.data.get("username")}-test",
             "lang": request.data.get("lang"),

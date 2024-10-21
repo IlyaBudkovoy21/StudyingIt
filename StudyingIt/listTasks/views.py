@@ -35,10 +35,6 @@ class CreateDestroyViewSet(mixins.CreateModelMixin,
     serializer_class = TasksSerializer
     permission_classes = [IsAdminUser]
 
-    def perform_create(self, serializer):
-        serializer.validated_data['hash_name'] = sha224(serializer.validated_data['name'].encode()).hexdigest()[:9]
-        serializer.save()
-
 
 class FilterTasksByManyCats(APIView):
     serializer_class = TasksSerializer

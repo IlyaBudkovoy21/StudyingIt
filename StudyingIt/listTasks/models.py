@@ -17,6 +17,10 @@ class Tasks(models.Model):
     hash_name = models.SlugField(editable=False, null=False)
     patterns = models.ForeignKey("CodePatterns", on_delete=models.CASCADE)
 
+    def save(self, *args, **kwargs):
+        self.hash_name = sha224(self.name.encode()).hexdigest()[:9]
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.name
 
@@ -25,3 +29,6 @@ class CodePatterns(models.Model):
     python = models.TextField()
     cpp = models.TextField()
     go = models.TextField()
+
+    def __str__(self):
+        return "Patterns"
