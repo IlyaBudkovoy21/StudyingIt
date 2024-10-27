@@ -38,7 +38,7 @@ class SaveCode(APIView):
         except botocore.exceptions.NoCredentialsError:
             raise Exception("Ошибка отправки сообщения")
         cl = client.get_client()
-        response = requests.post("http://localhost:1234/code", data={
+        response = requests.post("http://localhost:1234/code", json={
             "path": f"{request.data.get("task_name")}-folder/{request.data.get("username")}-folder/{request.data.get("username")}-test",
             "lang": request.data.get("lang"),
             "task_name": request.data.get("task_name"),
