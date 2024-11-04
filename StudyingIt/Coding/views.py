@@ -11,6 +11,7 @@ from hashlib import sha224
 import listTasks.models
 import io
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.parsers import JSONParser
 from listTasks.models import Tasks
@@ -58,9 +59,7 @@ def get_user(request, access_token):
     try:
         validated_token = jwt_auth.get_validated_token(access_token)
         user = jwt_auth.get_user(validated_token)
-        return Response({'username': str(user.username)})
-    except TokenError as e:
-        return Response({'detail': str(e)}, status=401)
+        return Response({'username': str(user.username)}, status=200)
     except Exception as e:
-        return Response({'detail': str(e)}, status=500)
+        return Response({'error': str(e)}, status=400)
 
