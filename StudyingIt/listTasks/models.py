@@ -16,6 +16,10 @@ class Tasks(models.Model):
     cat = models.ForeignKey(Types, on_delete=models.CASCADE, blank=False, default=0, null=False)
     hash_name = models.SlugField(editable=False, null=False)
     patterns = models.ForeignKey("CodePatterns", on_delete=models.CASCADE)
+    first_test = models.TextField(blank=False, null=False)
+    second_test = models.TextField(blank=False, null=False)
+    third_test = models.TextField(blank=False, null=False)
+    cost = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         self.hash_name = sha224(self.name.encode()).hexdigest()[:9]

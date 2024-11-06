@@ -13,3 +13,12 @@ services:
        image: redis:latest
        volumes:
          - .:/back/cache
+     test_db:
+       image: postgres:latest
+       env_file:
+         - .env
+       environment:
+         - POSTGRES_PASSWORD=${DB_PASSWORD_TEST}
+         - POSTGRES_USER=${DB_USER_TEST}
+         - POSTGRES_DB=${DB_TEST_NAME_DB}
+         - POSTGRES_HOST=${HOST_TEST}

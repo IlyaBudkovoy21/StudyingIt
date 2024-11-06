@@ -62,4 +62,3 @@ def get_user(request, access_token):
         return Response({'username': str(user.username)}, status=200)
     except Exception as e:
         return Response({'error': str(e)}, status=400)
-

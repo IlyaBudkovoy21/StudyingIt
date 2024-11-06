@@ -1,3 +1,3 @@
-from django.test import TestCase
-
+def test_work():
+    assert 1 == 2
 
