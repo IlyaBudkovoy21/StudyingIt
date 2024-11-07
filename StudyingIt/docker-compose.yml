@@ -15,6 +15,14 @@ services:
          - redis
        networks:
          - dev
+     comp:
+       build: killazius/compile-server:v1.0
+       ports:
+         - "1235:1235"
+       env_file:
+         - .env
+       networks:
+         - dev
      redis:
        image: redis:latest
        volumes:
