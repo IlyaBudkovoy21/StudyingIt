@@ -1,2 +1,4 @@
 .env
 venv/
+nginx.conf
+docker-compose.yml
