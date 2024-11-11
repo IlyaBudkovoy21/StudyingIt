@@ -14,7 +14,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -74,7 +74,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'StudyingIt.wsgi.application'
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 load_dotenv()
@@ -84,15 +83,15 @@ DATABASES = {
         'NAME': 'mydatabase',
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'PORT': '5432',
-        'HOST': os.getenv('HOST')
+        'PORT': os.getenv('PORT_DB'),
+        'HOST': os.getenv('HOST_DB')
     },
     "test": {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'test_db',
         'USER': os.getenv('DB_USER_TEST'),
         'PASSWORD': os.getenv('DB_PASSWORD_TEST'),
-        'PORT': '5432',
+        'PORT': os.getenv('TEST_PORT'),
         'HOST': os.getenv('HOST_TEST')
     }
 }
