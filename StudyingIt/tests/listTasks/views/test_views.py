@@ -6,7 +6,7 @@ from hashlib import sha224
 
 class TestListTasksViews:
     @pytest.mark.django_db(databases=["default", "test"])
-    def test_list_by_cat(self, db):
+    def test_list_by_cat(self, django_db_use_migrations, django_db_createdb):
         t = Types.objects.using("test").create(catTask="Programming")
         pat = CodePatterns.objects.using("test").create(python="sdaf", cpp="asdf", go="kadsf")
         check = Tasks.objects.using("test").create(

@@ -15,7 +15,10 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.parsers import JSONParser
 from listTasks.models import Tasks
-import requests
+import requests, logging
+
+
+log = logging.getLogger("Coding.views")
 
 
 class ReturnTask(generics.RetrieveAPIView):
@@ -39,6 +42,7 @@ class SaveCode(APIView):
             client.upload_file(file, request.data.get("username"), request.data.get("code"),
                                request.data.get("task_name"))
         except botocore.exceptions.NoCredentialsError:
+            log.error("Ошибка отправки сообщения в S3")
             raise Exception("Ошибка отправки сообщения")
         cl = client.get_client()
         response = requests.post("http://localhost:1234/code", json={
@@ -49,6 +53,7 @@ class SaveCode(APIView):
         if response.status_code == 200:
             return Response({"correct": "Success data transfer"})
         else:
+            log.error("Unsuccess data transfer")
             return Response({"uncorrect": f"Unsuccess data transfer with status code -> {response.status_code}"})
 
 

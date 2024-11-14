@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import logging, logging.config
 from datetime import timedelta
 from dotenv import load_dotenv
 
@@ -122,6 +123,35 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+LOGGING = {
+    'version': 1,
+    'loggers': {
+        'Coding.views': {
+            'handlers': ['file'],
+            'level': 'WARNING'
+        }
+    },
+    'handlers': {
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / "logs.log",
+            'formatter': 'default'
+        }
+    },
+    'formatters': {
+        'simple': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        "default": {
+            "format": "{levelname} {asctime}: {message} {pathname}(line {lineno})",
+            "style": "{"
+        }
+
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
