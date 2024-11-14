@@ -124,19 +124,32 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+# LOGGING
+
 LOGGING = {
     'version': 1,
     'loggers': {
         'Coding.views': {
-            'handlers': ['file'],
+            'handlers': ['coding.views'],
             'level': 'WARNING'
+        },
+        "Coding.s3": {
+            "handlers": ["coding.s3"],
+            "level": "WARNING"
         }
     },
     'handlers': {
-        'file': {
+        'coding.views': {
             'level': 'WARNING',
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR / "logs.log",
+            'filename': BASE_DIR / "logs" / "Coding" / "views.log",
+            'formatter': 'default'
+        },
+        "coding.s3": {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / "logs" / "Coding" / "s3.log",
             'formatter': 'default'
         }
     },
@@ -146,7 +159,7 @@ LOGGING = {
             'style': '{',
         },
         "default": {
-            "format": "{levelname} {asctime}: {message} {pathname}(line {lineno})",
+            "format": "{levelname} {asctime} {message} {pathname}(line {lineno})",
             "style": "{"
         }
 

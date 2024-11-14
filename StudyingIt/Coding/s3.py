@@ -1,5 +1,9 @@
 import boto3
+import logging
+
 from StudyingIt import settings
+
+log = logging.getLogger("Coding.s3")
 
 
 class ClientS3:
@@ -26,11 +30,13 @@ class ClientS3:
         check = client.list_objects_v2(Bucket=self.bucket_name, Prefix=f'{task_name}-folder/{username}-folder/')
         if 'Contents' not in check:
             client.put_object(Bucket=self.bucket_name, Key=f'{task_name}-folder/{username}-folder/')
-        client.put_object(
-            Bucket=self.bucket_name,
-            Key=f'{task_name}-folder/{username}-folder/{file_name}',
-            Body=text
-        )
+        try:
+            client.put_object(
+                Bucket=self.bucket_name,
+                Key=f'{task_name}-folder/{username}-folder/{file_name}',
+                Body=text)
+        except:
+            log.error("Can't put object to the storage")
 
 
 client = ClientS3(

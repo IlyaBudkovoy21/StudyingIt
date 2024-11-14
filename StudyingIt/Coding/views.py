@@ -17,7 +17,6 @@ from rest_framework.parsers import JSONParser
 from listTasks.models import Tasks
 import requests, logging
 
-
 log = logging.getLogger("Coding.views")
 
 
@@ -42,7 +41,7 @@ class SaveCode(APIView):
             client.upload_file(file, request.data.get("username"), request.data.get("code"),
                                request.data.get("task_name"))
         except botocore.exceptions.NoCredentialsError:
-            log.error("Ошибка отправки сообщения в S3")
+            log.error(f"Ошибка отправки сообщения в S3 для пользователя {request.data.get("username")}")
             raise Exception("Ошибка отправки сообщения")
         cl = client.get_client()
         response = requests.post("http://localhost:1234/code", json={
@@ -53,7 +52,7 @@ class SaveCode(APIView):
         if response.status_code == 200:
             return Response({"correct": "Success data transfer"})
         else:
-            log.error("Unsuccess data transfer")
+            log.error(f"{request.user}: Unsuccess data transfer")
             return Response({"uncorrect": f"Unsuccess data transfer with status code -> {response.status_code}"})
 
 
@@ -66,4 +65,5 @@ def get_user(request, access_token):
         user = jwt_auth.get_user(validated_token)
         return Response({'username': str(user.username)}, status=200)
     except Exception as e:
+        log.error("Invalid token")
         return Response({'error': str(e)}, status=400)
