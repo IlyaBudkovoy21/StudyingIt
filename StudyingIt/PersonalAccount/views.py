@@ -22,6 +22,7 @@ class Registration(APIView):
                 "refresh": str(refresh),
                 "access": str(refresh.access_token),
             }, status=status.HTTP_201_CREATED)
+
         return Response(status=status.HTTP_302_FOUND)
 
 

@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import logging, logging.config
 from datetime import timedelta
 from dotenv import load_dotenv
 
@@ -10,6 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -47,6 +49,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.cache.UpdateCacheMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.cache.FetchFromCacheMiddleware",
 ]
 
 ROOT_URLCONF = 'StudyingIt.urls'
@@ -70,7 +75,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'StudyingIt.wsgi.application'
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 load_dotenv()
@@ -80,8 +84,25 @@ DATABASES = {
         'NAME': 'mydatabase',
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'PORT': '5432',
-        'HOST': os.getenv('HOST')
+        'PORT': os.getenv('PORT_DB'),
+        'HOST': os.getenv('HOST_DB')
+    },
+    "test": {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'test_db',
+        'USER': os.getenv('DB_USER_TEST'),
+        'PASSWORD': os.getenv('DB_PASSWORD_TEST'),
+        'PORT': os.getenv('TEST_PORT'),
+        'HOST': os.getenv('HOST_TEST')
+    }
+}
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://redis:6379',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
     }
 }
 
@@ -103,6 +124,48 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+# LOGGING
+
+LOGGING = {
+    'version': 1,
+    'loggers': {
+        'Coding.views': {
+            'handlers': ['coding.views'],
+            'level': 'WARNING'
+        },
+        "Coding.s3": {
+            "handlers": ["coding.s3"],
+            "level": "WARNING"
+        }
+    },
+    'handlers': {
+        'coding.views': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / "logs" / "Coding" / "views.log",
+            'formatter': 'default'
+        },
+        "coding.s3": {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / "logs" / "Coding" / "s3.log",
+            'formatter': 'default'
+        }
+    },
+    'formatters': {
+        'simple': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        "default": {
+            "format": "{levelname} {asctime} {message} {pathname}(line {lineno})",
+            "style": "{"
+        }
+
+    }
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -118,6 +181,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
