@@ -1,23 +1,19 @@
 from rest_framework import generics, viewsets, mixins
 from rest_framework.permissions import IsAdminUser, AllowAny
 from .models import Tasks
-from rest_framework import status
-from rest_framework.response import Response
 from .serializers import TasksSerializer
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from hashlib import sha224
 
 
 class ListTasksByCat(generics.ListAPIView):
     serializer_class = TasksSerializer
+    lookup_url_kwarg = "cat"
 
     def get_queryset(self):
-        queryset = Tasks.objects.all()
-        filter_param = self.kwargs['cat']
-        queryset = queryset.filter(cat_id=filter_param)
-        return queryset
+        cat = self.kwargs.get(self.lookup_url_kwarg)
+        return Tasks.tasks_menu.single_cat(cat)
 
 
 class TasksRetrieveListViewsSet(mixins.ListModelMixin,
