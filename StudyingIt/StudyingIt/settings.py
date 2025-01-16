@@ -34,7 +34,8 @@ INSTALLED_APPS = [
     'PersonalAccount.apps.PersonalaccountConfig',
     'rest_framework',
     'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist'
+    'rest_framework_simplejwt.token_blacklist',
+    'debug_toolbar'
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -52,6 +53,7 @@ MIDDLEWARE = [
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.cache.FetchFromCacheMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware"
 ]
 
 ROOT_URLCONF = 'StudyingIt.urls'
@@ -176,6 +178,11 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
