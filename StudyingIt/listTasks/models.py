@@ -3,15 +3,12 @@ from hashlib import sha224
 
 
 # QuerySet's
-class TasksQuerySet(models.QuerySet):
+class TasksMenuManager(models.Manager):
     """
-    A QuerySet to display in the general list
+    A Manager to display in the general list
     """
-    def get_queryset(self):
-        return TasksQuerySet(self.model, using=self._db).defer("first_test", "second_test", "third_test", "patterns")
-
-    def _single_cat(self, cat):
-        return self.filter(cat_id=cat)
+    def single_cat(self, cat):
+        return super().get_queryset().filter(cat_id=cat).defer("first_test", "second_test", "third_test", "patterns")
 
 
 # Models
@@ -34,7 +31,7 @@ class Tasks(models.Model):
     cost = models.IntegerField(default=0)
 
     objects = models.Manager()
-    tasks_menu = TasksQuerySet.as_manager()
+    tasks_menu = TasksMenuManager()
 
     def save(self, *args, **kwargs):
         self.hash_name = sha224(self.name.encode()).hexdigest()[:9]

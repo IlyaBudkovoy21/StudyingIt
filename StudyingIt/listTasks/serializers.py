@@ -22,3 +22,9 @@ class TasksSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tasks
         fields = "__all__"
+
+
+class TasksMenuSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tasks
+        fields = ["id", "name", "desc", "hash_name", "cost", "patterns_id", "cat_id"]
