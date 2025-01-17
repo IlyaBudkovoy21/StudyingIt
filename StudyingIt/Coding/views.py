@@ -16,10 +16,14 @@ log = logging.getLogger("Coding.views")
 
 
 class ReturnTask(generics.RetrieveAPIView):
+    """
+    View for return one task to solving
+    """
+
     serializer_class = listTasks.serializers.TasksSerializer
 
     def get_queryset(self):
-        return Tasks.objects.all()
+        return Tasks.objects.all().iterator()
 
     def get_object(self):
         for i in self.get_queryset():
@@ -28,6 +32,10 @@ class ReturnTask(generics.RetrieveAPIView):
 
 
 class SaveCode(APIView):
+    """
+    View to save solutions
+    """
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request):

@@ -22,8 +22,12 @@ class ListTasksByCat(generics.ListAPIView):
 class TasksRetrieveListViewsSet(mixins.ListModelMixin,
                                 mixins.RetrieveModelMixin,
                                 viewsets.GenericViewSet):
-    queryset = Tasks.objects.all()
-    serializer_class = TasksSerializer
+    """
+    View for menu of all tasks
+    """
+
+    queryset = Tasks.tasks_menu.all()
+    serializer_class = TasksMenuSerializer
     permission_classes = [AllowAny]
 
 

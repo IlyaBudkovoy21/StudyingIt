@@ -2,7 +2,7 @@ from django.db import models
 from hashlib import sha224
 
 
-# QuerySet's
+# Manager's
 class TasksMenuManager(models.Manager):
     """
     A Manager to display in the general list
