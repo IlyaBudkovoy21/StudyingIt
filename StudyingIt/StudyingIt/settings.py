@@ -19,6 +19,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+SERVICES = (
+    os.getenv("IP_SERVICE_1"),
+)
+
 # Application definition
 
 INSTALLED_APPS = [

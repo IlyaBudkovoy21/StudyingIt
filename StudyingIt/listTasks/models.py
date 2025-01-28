@@ -40,6 +40,9 @@ class Tasks(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        db_table = "tasks_table"
+
 
 class CodePatterns(models.Model):
     python = models.TextField()

@@ -4,13 +4,18 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import api_view, permission_classes
+from django.db.transaction import atomic
+from django.shortcuts import get_object_or_404
 
 import requests, logging
 from .s3 import client
 import botocore.exceptions
+from datetime import datetime, timedelta
 
 from listTasks.models import Tasks
-import listTasks.models
+from listTasks.serializers import TasksSerializer
+from .permissions import NotForUsers
+from PersonalAccount.models import DatesInfoUser
 
 log = logging.getLogger("Coding.views")
 
@@ -20,15 +25,13 @@ class ReturnTask(generics.RetrieveAPIView):
     View for return one task to solving
     """
 
-    serializer_class = listTasks.serializers.TasksSerializer
+    serializer_class = TasksSerializer
 
     def get_queryset(self):
-        return Tasks.objects.all().iterator()
+        return Tasks.objects.all()
 
     def get_object(self):
-        for i in self.get_queryset():
-            if i.hash_name == self.kwargs["name"]:
-                return i
+        return self.get_queryset().get(hash_name=self.kwargs["name"])
 
 
 class SaveCode(APIView):
@@ -70,3 +73,23 @@ def get_user(request, access_token):
     except Exception as e:
         log.error("Invalid token")
         return Response({'error': str(e)}, status=400)
+
+
+class CodeMonitoring(APIView):
+    permission_classes = [NotForUsers]
+
+    @atomic()
+    def patch(self, request, **kwargs):
+        try:
+            info_user = DatesInfoUser.objects.get(
+                user__username=kwargs["username"])
+            if info_user.day_start_row + timedelta(
+                    days=info_user.days_in_row + 1) == datetime.now().date():
+                info_user.days_in_row += 1
+            else:
+                info_user.days_in_row = 0
+                info_user.day_start_row = datetime.now().date()
+            info_user.save()
+            return Response("Success date save", status=200)
+        except Exception as e:
+            print(e)
