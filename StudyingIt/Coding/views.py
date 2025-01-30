@@ -65,6 +65,9 @@ class SaveCode(APIView):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_user(request, access_token):
+    """
+    Returns the user by the passed token
+    """
     jwt_auth = JWTAuthentication()
     try:
         validated_token = jwt_auth.get_validated_token(access_token)
@@ -76,6 +79,9 @@ def get_user(request, access_token):
 
 
 class CodeMonitoring(APIView):
+    """
+    Class for save days of solving problems in a row
+    """
     permission_classes = [NotForUsers]
 
     @atomic()
@@ -86,10 +92,12 @@ class CodeMonitoring(APIView):
             if info_user.day_start_row + timedelta(
                     days=info_user.days_in_row + 1) == datetime.now().date():
                 info_user.days_in_row += 1
+                info_user.max_days = max(info_user.max_days, info_user.days_in_row)
             else:
                 info_user.days_in_row = 0
                 info_user.day_start_row = datetime.now().date()
             info_user.save()
             return Response("Success date save", status=200)
         except Exception as e:
-            print(e)
+            # place for logger
+            return Response(f"Unsuccess date save: {e}", status=507)

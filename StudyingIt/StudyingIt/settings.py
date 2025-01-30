@@ -102,15 +102,15 @@ DATABASES = {
         'HOST': os.getenv('HOST_TEST')
     }
 }
-#CACHES = {
-#    'default': {
-#        'BACKEND': 'django_redis.cache.RedisCache',
-#        'LOCATION': 'redis://redis:6379',
-#        'OPTIONS': {
-#            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-#        }
-#    }
-#}
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://redis:6379',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -129,7 +129,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # LOGGING
 
@@ -183,7 +182,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
@@ -207,7 +205,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 15
 }
-
 
 AWS_ACCESS_KEY_ID = os.getenv("ACCESS_KEY_AWS")
 AWS_SECRET_ACCESS_KEY = os.getenv("SECRET_KEY_AWS")

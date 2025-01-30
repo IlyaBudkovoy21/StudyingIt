@@ -13,8 +13,9 @@ class DatesInfoUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     day_start_row = models.DateField(null=True)
     days_in_row = models.IntegerField(default=0)
+    max_days = models.IntegerField(default=0)
 
     class Meta:
-        db_table = "user_dates"
+        db_table = "User_dates"
         verbose_name = "Date information"
         verbose_name_plural = "Dates information"
