@@ -5,7 +5,6 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import api_view, permission_classes
 from django.db.transaction import atomic
-from django.shortcuts import get_object_or_404
 
 import requests, logging
 from .s3 import client
@@ -16,6 +15,7 @@ from listTasks.models import Tasks
 from listTasks.serializers import TasksSerializer
 from .permissions import NotForUsers
 from PersonalAccount.models import DatesInfoUser
+from PersonalAccount.utility import get_username_by_access
 
 log = logging.getLogger("Coding.views")
 
@@ -68,14 +68,11 @@ def get_user(request, access_token):
     """
     Returns the user by the passed token
     """
-    jwt_auth = JWTAuthentication()
-    try:
-        validated_token = jwt_auth.get_validated_token(access_token)
-        user = jwt_auth.get_user(validated_token)
-        return Response({'username': str(user.username)}, status=200)
-    except Exception as e:
-        log.error("Invalid token")
-        return Response({'error': str(e)}, status=400)
+
+    user = get_username_by_access(access_token)
+    if user["status"] == "OK":
+        return Response({'username': user["data"]}, status=200)
+    return Response({'error': user["error"]}, status=400)
 
 
 class CodeMonitoring(APIView):
