@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+
 from hashlib import sha224
 
 
@@ -29,6 +31,7 @@ class Tasks(models.Model):
     second_test = models.TextField(blank=False, null=False)
     third_test = models.TextField(blank=False, null=False)
     cost = models.IntegerField(default=0)
+    users_solved = models.ManyToManyField(to=User)
 
     objects = models.Manager()
     tasks_menu = TasksMenuManager()
@@ -41,7 +44,7 @@ class Tasks(models.Model):
         return self.name
 
     class Meta:
-        db_table = "tasks_table"
+        db_table = "Tasks"
 
 
 class CodePatterns(models.Model):
