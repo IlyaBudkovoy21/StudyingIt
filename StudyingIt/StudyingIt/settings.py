@@ -137,7 +137,7 @@ LOGGING = {
     'loggers': {
         'Coding.views': {
             'handlers': ['coding.views'],
-            'level': 'WARNING'
+            'level': 'INFO'
         },
         "Coding.s3": {
             "handlers": ["coding.s3"],
