@@ -12,6 +12,7 @@ class NotForUsers(BasePermission):
 
     def has_permission(self, request, view):
         print(request.META["REMOTE_ADDR"])
+        print(SERVICES)
         if request.META["REMOTE_ADDR"] in SERVICES:
             return True
         return False

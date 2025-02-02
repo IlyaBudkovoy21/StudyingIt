@@ -86,7 +86,7 @@ class CodeMonitoring(APIView):
         try:
             info_user = DatesInfoUser.objects.get(
                 user__username=kwargs["username"])
-            if info_user.day_start_row + timedelta(
+            if info_user.day_start_row and info_user.day_start_row + timedelta(
                     days=info_user.days_in_row + 1) == datetime.now().date():
                 info_user.days_in_row += 1
                 info_user.max_days = max(info_user.max_days, info_user.days_in_row)
