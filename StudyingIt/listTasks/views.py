@@ -40,13 +40,13 @@ class CreateDestroyViewSet(mixins.CreateModelMixin,
 
 
 class FilterTasksByManyCats(APIView):
-    serializer_class = TasksSerializer
+    serializer_class = TasksMenuSerializer
     permission_classes = [AllowAny]
 
     def post(self, request):
         filter_param = request.data.get("cat")
         if not filter_param:
-            filtered_queryset = Tasks.objects.all()
+            filtered_queryset = Tasks.tasks_menu.all()
             serializer = self.serializer_class(filtered_queryset, many=True)
             return Response(serializer.data)
 
@@ -54,6 +54,6 @@ class FilterTasksByManyCats(APIView):
         for cat in filter_param:
             query |= Q(cat_id=cat)
 
-        filtered_queryset = Tasks.objects.all().filter(query)
+        filtered_queryset = Tasks.tasks_menu.filter(query)
         serializer = self.serializer_class(filtered_queryset, many=True)
         return Response(serializer.data)
