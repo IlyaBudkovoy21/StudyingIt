@@ -1,6 +1,10 @@
 from rest_framework.permissions import BasePermission
 
+import logging
+
 from StudyingIt.settings import SERVICES
+
+logger = logging.getLogger("Coding.persmissions")
 
 
 class NotForUsers(BasePermission):
@@ -11,8 +15,7 @@ class NotForUsers(BasePermission):
     message = "No access"
 
     def has_permission(self, request, view):
-        print(request.META["REMOTE_ADDR"])
-        print(SERVICES)
+        logger.warning(f"{request.META['REMOTE_ADDR']} wants to get access, {SERVICES} only allows")
         if request.META["REMOTE_ADDR"] in SERVICES:
             return True
         return False

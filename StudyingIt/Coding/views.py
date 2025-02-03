@@ -6,7 +6,8 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import api_view, permission_classes
 from django.db.transaction import atomic
 
-import requests, logging
+import requests
+import logging
 from .s3 import client
 import botocore.exceptions
 from datetime import datetime, timedelta

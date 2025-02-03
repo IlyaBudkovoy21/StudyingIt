@@ -102,6 +102,7 @@ DATABASES = {
         'HOST': os.getenv('HOST_TEST')
     }
 }
+
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
@@ -135,6 +136,10 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGGING = {
     'version': 1,
     'loggers': {
+        'Coding.persmissions': {
+            'handlers': ['coding.permissions'],
+            'level': 'WARNING'
+        },
         'Coding.views': {
             'handlers': ['coding.views'],
             'level': 'INFO'
@@ -142,16 +147,22 @@ LOGGING = {
         "Coding.s3": {
             "handlers": ["coding.s3"],
             "level": "WARNING"
-        }
+        },
     },
     'handlers': {
+        'coding.permissions': {
+            'level': "WARNING",
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / "logs" / "Coding" / "permissions.log",
+            'formatter': 'default'
+        },
         'coding.views': {
             'level': 'WARNING',
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / "logs" / "Coding" / "views.log",
             'formatter': 'default'
         },
-        "coding.s3": {
+        'coding.s3': {
             'level': 'WARNING',
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / "logs" / "Coding" / "s3.log",
@@ -164,7 +175,7 @@ LOGGING = {
             'style': '{',
         },
         "default": {
-            "format": "{levelname} {asctime} {message} {pathname}(line {lineno})",
+            "format": "\n{levelname} {asctime}\n{message}\n{pathname}(line {lineno})\n",
             "style": "{"
         }
 
