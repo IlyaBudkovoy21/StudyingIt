@@ -136,6 +136,10 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGGING = {
     'version': 1,
     'loggers': {
+        'PersonalAccount.views': {
+            'handlers': ['personal_account.permissions'],
+            'level': "WARNING",
+        },
         'Coding.permissions': {
             'handlers': ['coding.permissions'],
             'level': 'WARNING'
@@ -148,8 +152,24 @@ LOGGING = {
             "handlers": ["coding.s3"],
             "level": "WARNING"
         },
+        "listTasks.views": {
+            "handlers": ["listTasks.views"],
+            "level": "ERROR"
+        }
     },
     'handlers': {
+        'personal_account.permissions': {
+            'level': "WARNING",
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / "logs" / "PersonalAccount" / "views.log",
+            'formatter': 'default'
+        },
+        'listTasks.views': {
+            'level': "ERROR",
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / "logs" / "listTasks" / "views.log",
+            'formatter': 'default'
+        },
         'coding.permissions': {
             'level': "WARNING",
             'class': 'logging.FileHandler',
@@ -214,7 +234,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 15
+    'PAGE_SIZE': 25
 }
 
 AWS_ACCESS_KEY_ID = os.getenv("ACCESS_KEY_AWS")
