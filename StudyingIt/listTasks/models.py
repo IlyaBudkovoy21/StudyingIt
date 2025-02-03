@@ -9,8 +9,10 @@ class TasksMenuManager(models.Manager):
     """
     A Manager to display in the general list
     """
+
     def single_cat(self, cat):
-        return super().get_queryset().filter(cat_id=cat).defer("first_test", "second_test", "third_test", "patterns")
+        return super().get_queryset().filter(cat_id=cat).defer("first_test", "second_test", "third_test", "patterns_id",
+                                                               "id", "desc")
 
 
 # Models

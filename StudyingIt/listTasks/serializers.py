@@ -36,4 +36,4 @@ class TasksMenuSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Tasks
-        fields = ["id", "name", "desc", "hash_name", "cost", "patterns_id", "cat_id"]
+        fields = ["id", "name", "hash_name", "cost", "cat_id"]

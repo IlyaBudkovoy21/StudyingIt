@@ -6,6 +6,8 @@ from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+import json
+
 
 class ListTasksByCat(generics.ListAPIView):
     """
@@ -39,21 +41,17 @@ class CreateDestroyViewSet(mixins.CreateModelMixin,
     permission_classes = [IsAdminUser]
 
 
-class FilterTasksByManyCats(APIView):
+class FilterTasksByManyCats(generics.ListAPIView):
     serializer_class = TasksMenuSerializer
     permission_classes = [AllowAny]
 
-    def post(self, request):
-        filter_param = request.data.get("cat")
+    def get_queryset(self):
+        filter_param = self.request.GET.get("categories", None)
         if not filter_param:
-            filtered_queryset = Tasks.tasks_menu.all()
-            serializer = self.serializer_class(filtered_queryset, many=True)
-            return Response(serializer.data)
+            return Tasks.tasks_menu.all()
 
         query = Q()
+        filter_param = json.loads(filter_param)
         for cat in filter_param:
             query |= Q(cat_id=cat)
-
-        filtered_queryset = Tasks.tasks_menu.filter(query)
-        serializer = self.serializer_class(filtered_queryset, many=True)
-        return Response(serializer.data)
+        return Tasks.tasks_menu.filter(query)
