@@ -2,7 +2,6 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import api_view, permission_classes
 from django.db.transaction import atomic
 
@@ -81,6 +80,7 @@ class CodeMonitoring(APIView):
     Class for save days of solving problems in a row
     """
     permission_classes = [NotForUsers]
+    authentication_classes = []
 
     @atomic()
     def patch(self, request, **kwargs):

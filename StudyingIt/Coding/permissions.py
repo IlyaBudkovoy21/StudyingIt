@@ -12,7 +12,7 @@ class NotForUsers(BasePermission):
     Class for update date information
     '''
 
-    message = "No access"
+    message = "No access to this function"
 
     def has_permission(self, request, view):
         user_ip = request.META.get('HTTP_X_REAL_IP', None)
