@@ -136,7 +136,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGGING = {
     'version': 1,
     'loggers': {
-        'Coding.persmissions': {
+        'Coding.permissions': {
             'handlers': ['coding.permissions'],
             'level': 'WARNING'
         },
