@@ -21,6 +21,8 @@ ALLOWED_HOSTS = ['*']
 
 BASE_URL = os.getenv("DOMAIN_API")
 
+USE_X_FORWARDED_HOST = True
+
 SERVICES = (
     os.getenv("IP_SERVICE_1"),
 )
