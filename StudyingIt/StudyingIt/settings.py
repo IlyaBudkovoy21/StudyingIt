@@ -19,6 +19,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+BASE_URL = os.getenv("DOMAIN_API")
+
 SERVICES = (
     os.getenv("IP_SERVICE_1"),
 )
