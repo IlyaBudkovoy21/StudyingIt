@@ -44,7 +44,6 @@ class CreateDestroyViewSet(mixins.CreateModelMixin,
 class FilterTasksByManyCats(generics.ListAPIView):
     serializer_class = TasksMenuSerializer
     permission_classes = [AllowAny]
-    pagination_class = PaginTasks
 
     def get_queryset(self):
         filter_param = self.request.GET.get("categories", None)
