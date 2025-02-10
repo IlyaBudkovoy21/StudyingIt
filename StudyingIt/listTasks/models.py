@@ -1,8 +1,21 @@
 from django.db import models
-from django.db.models import F
+from django.contrib.auth.models import User
+
 from hashlib import sha224
 
 
+# Manager's
+class TasksMenuManager(models.Manager):
+    """
+    A Manager to display in the general list
+    """
+
+    def single_cat(self, cat):
+        return super().get_queryset().filter(cat_id=cat).defer("first_test", "second_test", "third_test", "patterns_id",
+                                                               "id", "desc")
+
+
+# Models
 class Types(models.Model):
     catTask = models.CharField(max_length=30, unique=True, verbose_name='Категория')
 
@@ -20,6 +33,10 @@ class Tasks(models.Model):
     second_test = models.TextField(blank=False, null=False)
     third_test = models.TextField(blank=False, null=False)
     cost = models.IntegerField(default=0)
+    users_solved = models.ManyToManyField(to=User)
+
+    objects = models.Manager()
+    tasks_menu = TasksMenuManager()
 
     def save(self, *args, **kwargs):
         self.hash_name = sha224(self.name.encode()).hexdigest()[:9]
@@ -27,6 +44,9 @@ class Tasks(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        db_table = "Tasks"
 
 
 class CodePatterns(models.Model):

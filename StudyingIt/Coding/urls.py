@@ -7,5 +7,5 @@ register_converter(converters.Valid_token, 'token')
 urlpatterns = [
     path("auth/<token:access_token>/", views.get_user),
     path("checkTask/", views.SaveCode.as_view()),
-    path('<slug:name>/', views.ReturnTask.as_view())
+    path("<slug:name>/", views.ReturnTask.as_view())
 ]

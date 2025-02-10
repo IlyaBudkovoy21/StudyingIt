@@ -1,38 +1,44 @@
-import os, json
-from .s3 import client
-import boto3
-from rest_framework import mixins
-import botocore.exceptions
-from rest_framework import generics, status
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from hashlib import sha224
-import listTasks.models
-import io
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.parsers import JSONParser
+from django.db.transaction import atomic
+
+import requests
+import logging
+from .s3 import client
+import botocore.exceptions
+from datetime import datetime, timedelta
+
 from listTasks.models import Tasks
-import requests, logging
+from listTasks.serializers import TasksSerializer
+from .permissions import NotForUsers
+from PersonalAccount.models import DatesInfoUser
+from PersonalAccount.utility import get_username_by_access
 
 log = logging.getLogger("Coding.views")
 
 
 class ReturnTask(generics.RetrieveAPIView):
-    serializer_class = listTasks.serializers.TasksSerializer
+    """
+    View for return one task to solving
+    """
+
+    serializer_class = TasksSerializer
 
     def get_queryset(self):
         return Tasks.objects.all()
 
     def get_object(self):
-        for i in self.get_queryset():
-            if i.hash_name == self.kwargs["name"]:
-                return i
+        return self.get_queryset().get(hash_name=self.kwargs["name"])
 
 
 class SaveCode(APIView):
+    """
+    View to save solutions
+    """
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -59,11 +65,37 @@ class SaveCode(APIView):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_user(request, access_token):
-    jwt_auth = JWTAuthentication()
-    try:
-        validated_token = jwt_auth.get_validated_token(access_token)
-        user = jwt_auth.get_user(validated_token)
-        return Response({'username': str(user.username)}, status=200)
-    except Exception as e:
-        log.error("Invalid token")
-        return Response({'error': str(e)}, status=400)
+    """
+    Returns the user by the passed token
+    """
+
+    user = get_username_by_access(access_token)
+    if user["status"] == "OK":
+        return Response({'username': user["data"]}, status=200)
+    return Response({'error': user["error"]}, status=400)
+
+
+class CodeMonitoring(APIView):
+    """
+    Class for save days of solving problems in a row
+    """
+    permission_classes = [NotForUsers]
+    authentication_classes = []
+
+    @atomic()
+    def patch(self, request, **kwargs):
+        try:
+            info_user = DatesInfoUser.objects.get(
+                user__username=kwargs["username"])
+            if info_user.day_start_row and info_user.day_start_row + timedelta(
+                    days=info_user.days_in_row + 1) == datetime.now().date():
+                info_user.days_in_row += 1
+                info_user.max_days = max(info_user.max_days, info_user.days_in_row)
+            else:
+                info_user.days_in_row = 0
+                info_user.day_start_row = datetime.now().date()
+            info_user.save()
+            return Response("Success date save", status=200)
+        except Exception as e:
+            # place for logger
+            return Response(f"Unsuccess date save: {e}", status=507)

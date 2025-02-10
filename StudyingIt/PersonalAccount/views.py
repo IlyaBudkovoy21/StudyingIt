@@ -1,10 +1,13 @@
-from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializer
 from rest_framework.permissions import IsAuthenticated
+
+from .models import CustomUser, DatesInfoUser
+from django.contrib.auth.models import User
+from .utility import get_username_by_access
 
 
 class Registration(APIView):
@@ -41,3 +44,27 @@ class Logout(APIView):
                 "error": "Неверный refresh токен"
             }, status=status.HTTP_400_BAD_REQUEST)
         return Response({"success": "Успешный выход"}, status=status.HTTP_200_OK)
+
+
+class Profile(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        token = request.META.get('HTTP_AUTHORIZATION', '')
+        bear, token = token.split()
+        if token:
+            username = get_username_by_access(token)
+            if username["status"] == "OK":
+                username = username["data"]
+                try:
+                    user = User.objects.only("id", "username").get(username=username)
+                    user_info = DatesInfoUser.objects.defer("day_start_row").get(pk=user.id)
+                    return Response({"username": user.username, "max_days": user_info.max_days,
+                                     "current_days_row": user_info.days_in_row})
+                except Exception as e:
+                    print(e)
+                    return Response({"detail": "Incorrect token processing"}, status=500)
+            else:
+                return Response(data={"detail": "Unvalid token"}, status=401)
+        else:
+            return Response(data={"detail": "Unvalid token"}, status=401)

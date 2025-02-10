@@ -19,6 +19,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+BASE_URL = os.getenv("DOMAIN_API")
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
+SERVICES = (
+    os.getenv("IP_SERVICE_1"),
+)
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -34,7 +44,8 @@ INSTALLED_APPS = [
     'PersonalAccount.apps.PersonalaccountConfig',
     'rest_framework',
     'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist'
+    'rest_framework_simplejwt.token_blacklist',
+    'debug_toolbar'
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -52,6 +63,7 @@ MIDDLEWARE = [
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.cache.FetchFromCacheMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware"
 ]
 
 ROOT_URLCONF = 'StudyingIt.urls'
@@ -96,6 +108,7 @@ DATABASES = {
         'HOST': os.getenv('HOST_TEST')
     }
 }
+
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
@@ -124,29 +137,58 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # LOGGING
 
 LOGGING = {
     'version': 1,
     'loggers': {
+        'PersonalAccount.views': {
+            'handlers': ['personal_account.permissions'],
+            'level': "WARNING",
+        },
+        'Coding.permissions': {
+            'handlers': ['coding.permissions'],
+            'level': 'WARNING'
+        },
         'Coding.views': {
             'handlers': ['coding.views'],
-            'level': 'WARNING'
+            'level': 'INFO'
         },
         "Coding.s3": {
             "handlers": ["coding.s3"],
             "level": "WARNING"
+        },
+        "listTasks.views": {
+            "handlers": ["listTasks.views"],
+            "level": "ERROR"
         }
     },
     'handlers': {
+        'personal_account.permissions': {
+            'level': "WARNING",
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / "logs" / "PersonalAccount" / "views.log",
+            'formatter': 'default'
+        },
+        'listTasks.views': {
+            'level': "ERROR",
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / "logs" / "listTasks" / "views.log",
+            'formatter': 'default'
+        },
+        'coding.permissions': {
+            'level': "WARNING",
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / "logs" / "Coding" / "permissions.log",
+            'formatter': 'default'
+        },
         'coding.views': {
             'level': 'WARNING',
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / "logs" / "Coding" / "views.log",
             'formatter': 'default'
         },
-        "coding.s3": {
+        'coding.s3': {
             'level': 'WARNING',
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / "logs" / "Coding" / "s3.log",
@@ -159,7 +201,7 @@ LOGGING = {
             'style': '{',
         },
         "default": {
-            "format": "{levelname} {asctime} {message} {pathname}(line {lineno})",
+            "format": "\n{levelname} {asctime}\n{message}\n{pathname}(line {lineno})\n",
             "style": "{"
         }
 
@@ -177,6 +219,10 @@ USE_I18N = True
 
 USE_TZ = True
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
@@ -192,7 +238,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 25
 }
 
 AWS_ACCESS_KEY_ID = os.getenv("ACCESS_KEY_AWS")

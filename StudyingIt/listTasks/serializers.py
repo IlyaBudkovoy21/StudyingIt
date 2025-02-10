@@ -4,12 +4,18 @@ from hashlib import sha224
 
 
 class PatternSerializer(serializers.ModelSerializer):
+    """
+    Serializer for patterns
+    """
     class Meta:
         model = CodePatterns
         fields = "__all__"
 
 
 class TasksSerializer(serializers.ModelSerializer):
+    """
+    Serializer for tasks
+    """
     patterns = PatternSerializer()
 
     def create(self, validated_data):
@@ -22,3 +28,12 @@ class TasksSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tasks
         fields = "__all__"
+
+
+class TasksMenuSerializer(serializers.ModelSerializer):
+    """
+    Serializer for tasks for menu
+    """
+    class Meta:
+        model = Tasks
+        fields = ["id", "name", "hash_name", "cost", "cat_id"]
