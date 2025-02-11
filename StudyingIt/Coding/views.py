@@ -16,6 +16,7 @@ from listTasks.serializers import TasksSerializer
 from .permissions import NotForUsers
 from PersonalAccount.models import DatesInfoUser
 from PersonalAccount.utility import get_username_by_access
+from django.contrib.auth.models import User
 
 log = logging.getLogger("Coding.views")
 
@@ -83,10 +84,21 @@ class CodeMonitoring(APIView):
     authentication_classes = []
 
     @atomic()
-    def patch(self, request, **kwargs):
+    def post(self, request, **kwargs):
+
+        task_id = kwargs.get("task_id", None)
+        username = kwargs.get("username", None)
+
+        if not (all(task_id, username)):
+            log.error("Not enough information to save")
+            return Response("Not enough information to save")
+
+        info_user = DatesInfoUser.objects.get(
+            user__username=username)
+        user = User.objects.get(username=username)
+        task = Tasks.objects.only("id", "name").get(id=task_id)
+
         try:
-            info_user = DatesInfoUser.objects.get(
-                user__username=kwargs["username"])
             if info_user.day_start_row and info_user.day_start_row + timedelta(
                     days=info_user.days_in_row + 1) == datetime.now().date():
                 info_user.days_in_row += 1
@@ -95,7 +107,14 @@ class CodeMonitoring(APIView):
                 info_user.days_in_row = 0
                 info_user.day_start_row = datetime.now().date()
             info_user.save()
-            return Response("Success date save", status=200)
         except Exception as e:
-            # place for logger
-            return Response(f"Unsuccess date save: {e}", status=507)
+            log.error("Unsuccess save solving dates")
+            return Response("Unsuccess save solving dates")
+
+        try:
+            task.users_solved.add(user)
+        except Exception as e:
+            log.error("Unsuccess save user task")
+            return Response("Unsuccess save user task")
+
+        return Response("Success date save", status=200)
