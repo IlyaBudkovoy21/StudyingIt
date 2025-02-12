@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from django.db.transaction import atomic
+from django.core.exceptions import ObjectDoesNotExist
 
 import requests
 import logging
@@ -84,19 +85,24 @@ class CodeMonitoring(APIView):
     authentication_classes = []
 
     @atomic()
-    def post(self, request, **kwargs):
+    def post(self, request):
 
-        task_id = kwargs.get("task_id", None)
-        username = kwargs.get("username", None)
+        task_id = request.data.get("task_id", None)
+        username = request.data.get("username", None)
 
-        if not (all(task_id, username)):
+        if not (all((task_id, username))):
             log.error("Not enough information to save")
             return Response("Not enough information to save")
 
-        info_user = DatesInfoUser.objects.get(
-            user__username=username)
         user = User.objects.get(username=username)
+        try:
+            info_user = DatesInfoUser.objects.get(
+                user__username=username)
+        except ObjectDoesNotExist as obj:
+            DatesInfoUser.objects.create(user=user)
+
         task = Tasks.objects.only("id", "name").get(id=task_id)
+        print(task)
 
         try:
             if info_user.day_start_row and info_user.day_start_row + timedelta(
