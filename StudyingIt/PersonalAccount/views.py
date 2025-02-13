@@ -64,8 +64,8 @@ class Profile(APIView):
                                      "current_days_row": user_info.days_in_row})
                 except Exception as e:
                     print(e)
-                    return Response({"detail": "Failure when trying to save to the database"}, status=500)
+                    return Response({"detail": "Failure when trying to save to the database"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
-                return Response(data={"detail": "Incorrect token processing"}, status=401)
+                return Response(data={"detail": "Incorrect token processing"}, status=status.HTTP_401_UNAUTHORIZED)
         else:
-            return Response(data={"detail": "Unvalid token"}, status=401)
+            return Response(data={"detail": "Unvalid token"}, status=status.HTTP_401_UNAUTHORIZED)

@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework import status
 from django.db.transaction import atomic
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -73,8 +74,8 @@ def get_user(request, access_token):
 
     user = get_username_by_access(access_token)
     if user["status"] == "OK":
-        return Response({'id': user["data"]}, status=200)
-    return Response({'error': user["error"]}, status=400)
+        return Response({'id': user["data"]}, status=status.HTTP_200_OK)
+    return Response({'error': user["error"]}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CodeMonitoring(APIView):
@@ -102,7 +103,6 @@ class CodeMonitoring(APIView):
             DatesInfoUser.objects.create(user=user)
 
         task = Tasks.objects.only("id", "name").get(id=task_id)
-        print(task)
 
         try:
             if info_user.day_start_row and info_user.day_start_row + timedelta(
@@ -123,4 +123,4 @@ class CodeMonitoring(APIView):
             log.error("Unsuccess save user task")
             return Response("Unsuccess save user task")
 
-        return Response("Success date save", status=200)
+        return Response("Success date save", status=status.HTTP_200_OK)
