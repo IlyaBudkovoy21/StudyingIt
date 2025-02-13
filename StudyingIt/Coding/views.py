@@ -73,7 +73,7 @@ def get_user(request, access_token):
 
     user = get_username_by_access(access_token)
     if user["status"] == "OK":
-        return Response({'username': user["data"]}, status=200)
+        return Response({'id': user["data"]}, status=200)
     return Response({'error': user["error"]}, status=400)
 
 
