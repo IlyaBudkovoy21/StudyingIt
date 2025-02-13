@@ -3,7 +3,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework import status
 from django.db.transaction import atomic
+from django.core.exceptions import ObjectDoesNotExist
 
 import requests
 import logging
@@ -16,6 +18,7 @@ from listTasks.serializers import TasksSerializer
 from .permissions import NotForUsers
 from PersonalAccount.models import DatesInfoUser
 from PersonalAccount.utility import get_username_by_access
+from django.contrib.auth.models import User
 
 log = logging.getLogger("Coding.views")
 
@@ -71,8 +74,8 @@ def get_user(request, access_token):
 
     user = get_username_by_access(access_token)
     if user["status"] == "OK":
-        return Response({'username': user["data"]}, status=200)
-    return Response({'error': user["error"]}, status=400)
+        return Response({'id': user["data"]}, status=status.HTTP_200_OK)
+    return Response({'error': user["error"]}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CodeMonitoring(APIView):
@@ -83,10 +86,25 @@ class CodeMonitoring(APIView):
     authentication_classes = []
 
     @atomic()
-    def patch(self, request, **kwargs):
+    def post(self, request):
+
+        task_id = request.data.get("task_id", None)
+        username = request.data.get("username", None)
+
+        if not (all((task_id, username))):
+            log.error("Not enough information to save")
+            return Response("Not enough information to save")
+
+        user = User.objects.get(username=username)
         try:
             info_user = DatesInfoUser.objects.get(
-                user__username=kwargs["username"])
+                user__username=username)
+        except ObjectDoesNotExist as obj:
+            DatesInfoUser.objects.create(user=user)
+
+        task = Tasks.objects.only("id", "name").get(id=task_id)
+
+        try:
             if info_user.day_start_row and info_user.day_start_row + timedelta(
                     days=info_user.days_in_row + 1) == datetime.now().date():
                 info_user.days_in_row += 1
@@ -95,7 +113,14 @@ class CodeMonitoring(APIView):
                 info_user.days_in_row = 0
                 info_user.day_start_row = datetime.now().date()
             info_user.save()
-            return Response("Success date save", status=200)
         except Exception as e:
-            # place for logger
-            return Response(f"Unsuccess date save: {e}", status=507)
+            log.error("Unsuccess save solving dates")
+            return Response("Unsuccess save solving dates")
+
+        try:
+            task.users_solved.add(user)
+        except Exception as e:
+            log.error("Unsuccess save user task")
+            return Response("Unsuccess save user task")
+
+        return Response("Success date save", status=status.HTTP_200_OK)

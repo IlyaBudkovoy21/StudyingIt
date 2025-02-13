@@ -59,12 +59,12 @@ class Profile(APIView):
                 try:
                     user = User.objects.only("id", "username").get(username=username)
                     user_info = DatesInfoUser.objects.defer("day_start_row").get(pk=user.id)
+
                     return Response({"username": user.username, "max_days": user_info.max_days,
                                      "current_days_row": user_info.days_in_row})
                 except Exception as e:
-                    print(e)
-                    return Response({"detail": "Incorrect token processing"}, status=500)
+                    return Response({"detail": "Failure when trying to save to the database"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
-                return Response(data={"detail": "Unvalid token"}, status=401)
+                return Response(data={"detail": "Incorrect token processing"}, status=status.HTTP_401_UNAUTHORIZED)
         else:
-            return Response(data={"detail": "Unvalid token"}, status=401)
+            return Response(data={"detail": "Unvalid token"}, status=status.HTTP_401_UNAUTHORIZED)
