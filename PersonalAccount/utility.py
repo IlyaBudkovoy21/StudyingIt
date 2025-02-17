@@ -1,7 +1,7 @@
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
-def get_username_by_access(access_token):
+def get_user_id_by_access(access_token):
     jwt_auth = JWTAuthentication()
     try:
         validated_token = jwt_auth.get_validated_token(access_token)

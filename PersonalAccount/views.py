@@ -5,9 +5,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializer
 from rest_framework.permissions import IsAuthenticated
 
+import logging
+
 from .models import CustomUser, DatesInfoUser
 from django.contrib.auth.models import User
-from .utility import get_username_by_access
+from .utility import get_user_id_by_access
+
+logger = logging.getLogger('PersonalAccount.views')
 
 
 class Registration(APIView):
@@ -53,18 +57,21 @@ class Profile(APIView):
         token = request.META.get('HTTP_AUTHORIZATION', '')
         bear, token = token.split()
         if token:
-            username = get_username_by_access(token)
-            if username["status"] == "OK":
-                username = username["data"]
+            user = get_user_id_by_access(token)
+            if user["status"] == "OK":
+                id = user["data"]
+                print(id)
                 try:
-                    user = User.objects.only("id", "username").get(username=username)
+                    user = User.objects.only("id", "username").get(id=id)
                     user_info = DatesInfoUser.objects.defer("day_start_row").get(pk=user.id)
                     solved_tasks = list(user.tasks_set.all().only("id").values_list("id", flat=True))
                     return Response({"username": user.username, "max_days": user_info.max_days,
                                      "current_days_row": user_info.days_in_row, "tasks": solved_tasks})
                 except Exception as e:
-                    return Response({"detail": "Failure when trying to get data from the database"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    logger.warning(e)
+                    return Response({"detail": "Failure when trying to get data from the database"},
+                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 return Response(data={"detail": "Incorrect token processing"}, status=status.HTTP_401_UNAUTHORIZED)
         else:
-            return Response(data={"detail": "Unvalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(data={"detail": "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)

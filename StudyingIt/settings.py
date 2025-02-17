@@ -144,7 +144,7 @@ LOGGING = {
     'version': 1,
     'loggers': {
         'PersonalAccount.views': {
-            'handlers': ['personal_account.permissions'],
+            'handlers': ['personal_account.views'],
             'level': "WARNING",
         },
         'Coding.permissions': {
@@ -165,10 +165,16 @@ LOGGING = {
         }
     },
     'handlers': {
+        'personal_account.views': {
+            'level': "WARNING",
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'PersonalAccount' / 'views.log',
+            'formatter': 'default'
+        },
         'personal_account.permissions': {
             'level': "WARNING",
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR / "logs" / "PersonalAccount" / "views.log",
+            'filename': BASE_DIR / "logs" / "PersonalAccount" / "permissions.log",
             'formatter': 'default'
         },
         'listTasks.views': {

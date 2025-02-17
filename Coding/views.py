@@ -17,7 +17,7 @@ from listTasks.models import Tasks
 from listTasks.serializers import TasksSerializer
 from .permissions import NotForUsers
 from PersonalAccount.models import DatesInfoUser
-from PersonalAccount.utility import get_username_by_access
+from PersonalAccount.utility import get_user_id_by_access
 from django.contrib.auth.models import User
 
 log = logging.getLogger("Coding.views")
@@ -72,7 +72,7 @@ def get_user(request, access_token):
     Returns the user by the passed token
     """
 
-    user = get_username_by_access(access_token)
+    user = get_user_id_by_access(access_token)
     if user["status"] == "OK":
         return Response({'id': user["data"]}, status=status.HTTP_200_OK)
     return Response({'error': user["error"]}, status=status.HTTP_400_BAD_REQUEST)
