@@ -89,16 +89,16 @@ class CodeMonitoring(APIView):
     def post(self, request):
 
         task_id = request.data.get("task_id", None)
-        username = request.data.get("username", None)
+        id = request.data.get("id", None)
 
-        if not (all((task_id, username))):
+        if not (all((task_id, id))):
             log.error("Not enough information to save")
             return Response("Not enough information to save")
 
-        user = User.objects.get(username=username)
+        user = User.objects.get(id=id)
         try:
             info_user = DatesInfoUser.objects.get(
-                user__username=username)
+                user__id=id)
         except ObjectDoesNotExist as obj:
             DatesInfoUser.objects.create(user=user)
 
