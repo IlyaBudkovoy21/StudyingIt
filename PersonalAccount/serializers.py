@@ -21,3 +21,10 @@ class UserSerializer(ModelSerializer):
     class Meta:
         fields = ("username", "email", "password")
         model = User
+
+
+class ProfileSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=20)
+    max_days = serializers.IntegerField()
+    current_days_row = serializers.IntegerField()
+    tasks = serializers.ListSerializer(child=serializers.IntegerField())

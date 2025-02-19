@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 
 import logging
 
+from .serializers import ProfileSerializer
 from .models import CustomUser, DatesInfoUser
 from django.contrib.auth.models import User
 from .utility import get_user_id_by_access
@@ -60,13 +61,13 @@ class Profile(APIView):
             user = get_user_id_by_access(token)
             if user["status"] == "OK":
                 id = user["data"]
-                print(id)
                 try:
                     user = User.objects.only("id", "username").get(id=id)
                     user_info = DatesInfoUser.objects.defer("day_start_row").get(pk=user.id)
                     solved_tasks = list(user.tasks_set.all().only("id").values_list("id", flat=True))
-                    return Response({"username": user.username, "max_days": user_info.max_days,
-                                     "current_days_row": user_info.days_in_row, "tasks": solved_tasks})
+                    serializer = ProfileSerializer({"username": user.username, "max_days": user_info.max_days,
+                                                    "current_days_row": user_info.days_in_row, "tasks": solved_tasks})
+                    return Response(serializer.data, status=status.HTTP_200_OK)
                 except Exception as e:
                     logger.warning(e)
                     return Response({"detail": "Failure when trying to get data from the database"},
