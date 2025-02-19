@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    'debug_toolbar'
+    'debug_toolbar',
+    'drf_spectacular'
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -109,7 +110,7 @@ DATABASES = {
         'HOST': os.getenv('HOST_TEST')
     }
 }
-
+'''
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
@@ -119,7 +120,7 @@ CACHES = {
         }
     }
 }
-
+'''
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -247,7 +248,16 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 25
+    'PAGE_SIZE': 25,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'StudyingIt',
+    'DESCRIPTION': 'Greatest online platform for preparing for a programming interview',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
 }
 
 AWS_ACCESS_KEY_ID = os.getenv("ACCESS_KEY_AWS")
