@@ -110,7 +110,7 @@ DATABASES = {
         'HOST': os.getenv('HOST_TEST')
     }
 }
-'''
+
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
@@ -120,7 +120,7 @@ CACHES = {
         }
     }
 }
-'''
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 

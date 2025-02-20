@@ -13,4 +13,5 @@ urlpatterns = [
     path('tasks/', include(router.urls)),
     path('tasks_admin/', include(router1.urls)),
     path('filter_tasks/', views.FilterTasksByManyCats.as_view()),
+    path('all_categories/', views.ReturnAllCategories.as_view())
 ]

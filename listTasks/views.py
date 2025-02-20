@@ -1,10 +1,11 @@
 from rest_framework import generics, viewsets, mixins
 from rest_framework.permissions import IsAdminUser, AllowAny
-from .models import Tasks
-from .serializers import TasksSerializer, TasksMenuSerializer
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from .serializers import TasksSerializer, TasksMenuSerializer, AllTypes
+from .models import Tasks, Types
 
 import json
 
@@ -55,3 +56,12 @@ class FilterTasksByManyCats(generics.ListAPIView):
         for cat in filter_param:
             query |= Q(cat_id=cat)
         return Tasks.tasks_menu.filter(query)
+
+
+class ReturnAllCategories(generics.ListAPIView):
+    '''
+    Return all categories
+    '''
+
+    serializer_class = AllTypes
+    queryset = Types.objects.all()
