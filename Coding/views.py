@@ -74,7 +74,7 @@ def get_user(request, access_token):
 
     user = get_user_id_by_access(access_token)
     if user["status"] == "OK":
-        return Response({'id': user["data"]}, status=status.HTTP_200_OK)
+        return Response({'user_id': user["data"]}, status=status.HTTP_200_OK)
     return Response({'error': user["error"]}, status=status.HTTP_400_BAD_REQUEST)
 
 

@@ -64,7 +64,7 @@ class Profile(APIView):
                 try:
                     user = User.objects.only("id", "username").get(id=id)
                     user_info = DatesInfoUser.objects.defer("day_start_row").get(pk=user.id)
-                    solved_tasks = list(user.tasks_set.all().only("id").values_list("id", flat=True))
+                    solved_tasks = list(user.tasks_set.all().only("id", "level").values("id", "level"))
                     serializer = ProfileSerializer({"username": user.username, "max_days": user_info.max_days,
                                                     "current_days_row": user_info.days_in_row, "tasks": solved_tasks})
                     return Response(serializer.data, status=status.HTTP_200_OK)
