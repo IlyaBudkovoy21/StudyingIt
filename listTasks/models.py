@@ -34,6 +34,15 @@ class Tasks(models.Model):
     third_test = models.TextField(blank=False, null=False)
     cost = models.IntegerField(default=0)
     users_solved = models.ManyToManyField(to=User)
+    level = models.CharField(
+        max_length=1,
+        choices=[
+            ('H', 'Hard'),
+            ('M', 'Medium'),
+            ('E', 'Easy'),
+        ],
+        default='E'
+    )
 
     objects = models.Manager()
     tasks_menu = TasksMenuManager()

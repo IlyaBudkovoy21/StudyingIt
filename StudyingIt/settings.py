@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    'debug_toolbar'
+    'debug_toolbar',
+    'drf_spectacular'
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -144,7 +145,7 @@ LOGGING = {
     'version': 1,
     'loggers': {
         'PersonalAccount.views': {
-            'handlers': ['personal_account.permissions'],
+            'handlers': ['personal_account.views'],
             'level': "WARNING",
         },
         'Coding.permissions': {
@@ -165,10 +166,16 @@ LOGGING = {
         }
     },
     'handlers': {
+        'personal_account.views': {
+            'level': "WARNING",
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'PersonalAccount' / 'views.log',
+            'formatter': 'default'
+        },
         'personal_account.permissions': {
             'level': "WARNING",
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR / "logs" / "PersonalAccount" / "views.log",
+            'filename': BASE_DIR / "logs" / "PersonalAccount" / "permissions.log",
             'formatter': 'default'
         },
         'listTasks.views': {
@@ -241,7 +248,16 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 25
+    'PAGE_SIZE': 25,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'StudyingIt',
+    'DESCRIPTION': 'Greatest online platform for preparing for a programming interview',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
 }
 
 AWS_ACCESS_KEY_ID = os.getenv("ACCESS_KEY_AWS")

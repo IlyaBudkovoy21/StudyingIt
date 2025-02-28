@@ -1,12 +1,16 @@
 from rest_framework import serializers
-from .models import Tasks, CodePatterns
+
+from .models import Tasks, CodePatterns, Types
+
 from hashlib import sha224
+
 
 
 class PatternSerializer(serializers.ModelSerializer):
     """
     Serializer for patterns
     """
+
     class Meta:
         model = CodePatterns
         fields = "__all__"
@@ -34,6 +38,17 @@ class TasksMenuSerializer(serializers.ModelSerializer):
     """
     Serializer for tasks for menu
     """
+
     class Meta:
         model = Tasks
         fields = ["id", "name", "hash_name", "cost", "cat_id"]
+
+
+class AllTypes(serializers.ModelSerializer):
+    '''
+    Serializer for types
+    '''
+
+    class Meta:
+        fields = '__all__'
+        model = Types

@@ -17,7 +17,7 @@ from listTasks.models import Tasks
 from listTasks.serializers import TasksSerializer
 from .permissions import NotForUsers
 from PersonalAccount.models import DatesInfoUser
-from PersonalAccount.utility import get_username_by_access
+from PersonalAccount.utility import get_user_id_by_access
 from django.contrib.auth.models import User
 
 log = logging.getLogger("Coding.views")
@@ -59,10 +59,11 @@ class SaveCode(APIView):
             "task_name": request.data.get("task_name"),
             "username": request.data.get("username")})
         if response.status_code == 200:
-            return Response({"correct": "Success data transfer"})
+            return Response({"correct": "Success data transfer"}, status=status.HTTP_200_OK)
         else:
             log.error(f"{request.user}: Unsuccess data transfer")
-            return Response({"uncorrect": f"Unsuccess data transfer with status code -> {response.status_code}"})
+            return Response({"uncorrect": f"Unsuccess data transfer with status code -> {response.status_code}"},
+                            status=response.status_code)
 
 
 @api_view(['GET'])
@@ -72,9 +73,9 @@ def get_user(request, access_token):
     Returns the user by the passed token
     """
 
-    user = get_username_by_access(access_token)
+    user = get_user_id_by_access(access_token)
     if user["status"] == "OK":
-        return Response({'id': user["data"]}, status=status.HTTP_200_OK)
+        return Response({'user_id': user["data"]}, status=status.HTTP_200_OK)
     return Response({'error': user["error"]}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -93,7 +94,7 @@ class CodeMonitoring(APIView):
 
         if not (all((task_id, id))):
             log.error("Not enough information to save")
-            return Response("Not enough information to save")
+            return Response("Not enough information to save", status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.get(id=id)
         try:
@@ -115,12 +116,12 @@ class CodeMonitoring(APIView):
             info_user.save()
         except Exception as e:
             log.error("Unsuccess save solving dates")
-            return Response("Unsuccess save solving dates")
+            return Response("Unsuccess save solving dates", status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         try:
             task.users_solved.add(user)
         except Exception as e:
             log.error("Unsuccess save user task")
-            return Response("Unsuccess save user task")
+            return Response("Unsuccess save user task", status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         return Response("Success date save", status=status.HTTP_200_OK)
