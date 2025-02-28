@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 
 import logging
 
-from .serializers import ProfileSerializer
+from .serializers import ProfileSerializer, TokenSerializer
 from .models import CustomUser, DatesInfoUser
 from django.contrib.auth.models import User
 from .utility import get_user_id_by_access
@@ -26,10 +26,11 @@ class Registration(APIView):
                 "username": user.username
             }
             )
-            return Response({
+            serialize = TokenSerializer({
                 "refresh": str(refresh),
                 "access": str(refresh.access_token),
-            }, status=status.HTTP_201_CREATED)
+            })
+            return Response(serialize.data, status=status.HTTP_201_CREATED)
 
         return Response(status=status.HTTP_302_FOUND)
 

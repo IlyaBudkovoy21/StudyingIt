@@ -28,3 +28,8 @@ class ProfileSerializer(serializers.Serializer):
     max_days = serializers.IntegerField()
     current_days_row = serializers.IntegerField()
     tasks = serializers.ListSerializer(child=serializers.DictField())
+
+
+class TokenSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+    access = serializers.CharField()
