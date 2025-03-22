@@ -86,42 +86,64 @@ class CodeMonitoring(APIView):
     permission_classes = [NotForUsers]
     authentication_classes = []
 
+    @staticmethod
+    def get_or_create_info_user(id_user, user):
+        try:
+            return DatesInfoUser.objects.get(
+                user__id=id_user)
+        except ObjectDoesNotExist:
+            return DatesInfoUser.objects.create(user=user)
+
+    @staticmethod
+    def get_user(user_id):
+        try:
+            return User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return None
+
+    @staticmethod
+    def get_task(task_id):
+        try:
+            return Tasks.objects.only("id", "name").get(id=task_id)
+        except ObjectDoesNotExist:
+            return None
+
+    @staticmethod
+    def update_user_streak(info_user):
+        if info_user.day_start_row and info_user.day_start_row + timedelta(
+                days=info_user.days_in_row + 1) == datetime.now().date():
+            info_user.days_in_row += 1
+            info_user.max_days = max(info_user.max_days, info_user.days_in_row)
+        else:
+            info_user.days_in_row = 0
+            info_user.day_start_row = datetime.now().date()
+        info_user.save()
+
     @atomic()
     def post(self, request):
 
         task_id = request.data.get("task_id", None)
-        id = request.data.get("id", None)
+        user_id = request.data.get("id", None)
 
-        if not (all((task_id, id))):
+        if not (all((task_id, user_id))):
             log.error("Not enough information to save")
             return Response("Not enough information to save", status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.get(id=id)
-        try:
-            info_user = DatesInfoUser.objects.get(
-                user__id=id)
-        except ObjectDoesNotExist as obj:
-            DatesInfoUser.objects.create(user=user)
+        user = CodeMonitoring.get_user(user_id)
+        if user is None:
+            log.error("User is not found")
+            return Response("User is not found",
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        task = Tasks.objects.only("id", "name").get(id=task_id)
+        info_user = CodeMonitoring.get_or_create_info_user(user_id, user)
+        task = CodeMonitoring.get_task(task_id)
 
-        try:
-            if info_user.day_start_row and info_user.day_start_row + timedelta(
-                    days=info_user.days_in_row + 1) == datetime.now().date():
-                info_user.days_in_row += 1
-                info_user.max_days = max(info_user.max_days, info_user.days_in_row)
-            else:
-                info_user.days_in_row = 0
-                info_user.day_start_row = datetime.now().date()
-            info_user.save()
-        except Exception as e:
-            log.error("Unsuccess save solving dates")
-            return Response("Unsuccess save solving dates", status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        if any(info is None for info in (info_user, task)):
+            log.error("Some information about the user does not exist in the database")
+            return Response("Some information about the user does not exist in the database",
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            task.users_solved.add(user)
-        except Exception as e:
-            log.error("Unsuccess save user task")
-            return Response("Unsuccess save user task", status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        CodeMonitoring.update_user_streak(info_user)
+        task.users_solved.add(user)
 
-        return Response("Success date save", status=status.HTTP_200_OK)
+        return Response("Success data save", status=status.HTTP_200_OK)
