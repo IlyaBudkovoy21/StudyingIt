@@ -88,11 +88,10 @@ class CodeMonitoring(APIView):
 
     @staticmethod
     def get_or_create_info_user(id_user, user):
-        try:
-            return DatesInfoUser.objects.get(
-                user__id=id_user)
-        except ObjectDoesNotExist:
-            return DatesInfoUser.objects.create(user=user)
+        return DatesInfoUser.objects.get_or_create(
+            user__id=id_user,
+            defaults={'user': user}
+        )
 
     @staticmethod
     def get_user(user_id):
@@ -130,20 +129,15 @@ class CodeMonitoring(APIView):
             return Response("Not enough information to save", status=status.HTTP_400_BAD_REQUEST)
 
         user = CodeMonitoring.get_user(user_id)
-        if user is None:
-            log.error("User is not found")
-            return Response("User is not found",
-                            status=status.HTTP_400_BAD_REQUEST)
+        task = CodeMonitoring.get_task(task_id)
+        if user is None or task is None:
+            log.error(f"User or task is not found: task - {task_id}, user - {user_id}")
+            return Response(f"User or task is not found: task - {task_id}, user - {user_id}",
+                            status=status.HTTP_404_NOT_FOUND)
 
         info_user = CodeMonitoring.get_or_create_info_user(user_id, user)
-        task = CodeMonitoring.get_task(task_id)
 
-        if any(info is None for info in (info_user, task)):
-            log.error("Some information about the user does not exist in the database")
-            return Response("Some information about the user does not exist in the database",
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        CodeMonitoring.update_user_streak(info_user)
+        CodeMonitoring.update_user_streak(info_user[0])
         task.users_solved.add(user)
 
         return Response("Success data save", status=status.HTTP_200_OK)
