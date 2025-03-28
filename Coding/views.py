@@ -87,13 +87,6 @@ class CodeMonitoring(APIView):
     authentication_classes = []
 
     @staticmethod
-    def get_or_create_info_user(id_user, user):
-        return DatesInfoUser.objects.get_or_create(
-            user__id=id_user,
-            defaults={'user': user}
-        )
-
-    @staticmethod
     def get_user(user_id):
         try:
             return User.objects.get(id=user_id)
@@ -110,12 +103,12 @@ class CodeMonitoring(APIView):
     @staticmethod
     def update_user_streak(info_user):
         if info_user.day_start_row and info_user.day_start_row + timedelta(
-                days=info_user.days_in_row + 1) == datetime.now().date():
+                days=info_user.days_in_row) == datetime.now().date():
             info_user.days_in_row += 1
-            info_user.max_days = max(info_user.max_days, info_user.days_in_row)
         else:
-            info_user.days_in_row = 0
+            info_user.days_in_row = 1
             info_user.day_start_row = datetime.now().date()
+        info_user.max_days = max(info_user.max_days, info_user.days_in_row)
         info_user.save()
 
     @atomic()
@@ -135,7 +128,10 @@ class CodeMonitoring(APIView):
             return Response(f"User or task is not found: task - {task_id}, user - {user_id}",
                             status=status.HTTP_404_NOT_FOUND)
 
-        info_user = CodeMonitoring.get_or_create_info_user(user_id, user)
+        info_user = DatesInfoUser.objects.get_or_create(
+            user__id=user_id,
+            defaults={'user': user}
+        )
 
         CodeMonitoring.update_user_streak(info_user[0])
         task.users_solved.add(user)
