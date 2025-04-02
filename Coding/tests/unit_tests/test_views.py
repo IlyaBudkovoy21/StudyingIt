@@ -16,6 +16,7 @@ class TestCodeMonitoring:
             (10, None),
             (7, User),
             (50, None),
+            ("asdfasdfasdf", None),
         ]
     )
     def test_get_user(self, user_id, exp_result):
@@ -35,6 +36,7 @@ class TestCodeMonitoring:
             (10, None),
             (7, Tasks),
             (50, None),
+            ("asdfasdf", None)
         ]
     )
     def test_get_task(self, task_id, exp_result):

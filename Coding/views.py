@@ -92,12 +92,18 @@ class CodeMonitoring(APIView):
             return User.objects.get(id=user_id)
         except ObjectDoesNotExist:
             return None
+        except ValueError:
+            log.warning(f"Invalid user_id format: {user_id}")
+            return None
 
     @staticmethod
     def get_task(task_id):
         try:
             return Tasks.objects.only("id", "name").get(id=task_id)
         except ObjectDoesNotExist:
+            return None
+        except ValueError:
+            log.warning(f"Invalid task_id format: {task_id}")
             return None
 
     @staticmethod
