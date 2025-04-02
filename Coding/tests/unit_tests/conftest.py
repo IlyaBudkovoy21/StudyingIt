@@ -2,9 +2,8 @@ from django.contrib.auth.models import User
 
 import pytest
 
-from PersonalAccount.models import DatesInfoUser
 from listTasks.models import Tasks
-from .mocks import MockTasksGet, mock_db_users, MockDatesInfoUser
+from Coding.tests.unit_tests.mocks import MockTasksGet, mock_db_users
 
 
 @pytest.fixture(autouse=True)

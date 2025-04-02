@@ -5,8 +5,7 @@ from datetime import datetime, timedelta
 
 from listTasks.models import Tasks
 from Coding.views import CodeMonitoring
-from PersonalAccount.models import DatesInfoUser
-from .mocks import MockDatesInfoUser
+from Coding.tests.unit_tests.mocks import MockDatesInfoUser
 
 
 class TestCodeMonitoring:
