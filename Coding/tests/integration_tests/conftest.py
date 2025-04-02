@@ -1,15 +1,13 @@
-from rest_framework.test import APIRequestFactory
+from django.contrib.auth.models import User
 
 import pytest
+from datetime import datetime, timedelta
 
-from django.conf import settings
-from django.contrib.auth.models import User
 from PersonalAccount.models import DatesInfoUser
 from listTasks.models import Tasks, Types, CodePatterns
 
 
-
-@pytest.fixture()
+@pytest.fixture(scope="class")
 @pytest.mark.django_db
 def create_db_data(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
@@ -83,7 +81,23 @@ def create_db_data(django_db_setup, django_db_blocker):
         for data in tasks_data:
             tasks_instances.append(Tasks.objects.create(**data))
 
-        user1 = User.objects.create(username="testuser1")
-        user2 = User.objects.create(username="testuser2")
-        tasks_instances[0].users_solved.add(user1)
-        tasks_instances[1].users_solved.add(user2)
+        date_streaks = [None,
+                        (datetime(2023, 12, 31, 15, 30, 0), 13, 4),
+                        (datetime.now().date(), 13, 1),
+                        (datetime.now().date() - timedelta(days=1), 13, 1),
+                        (datetime.now().date() - timedelta(days=2), 13, 1),
+                        (datetime.now().date() - timedelta(days=5), 0, 5),
+                        (datetime.now().date() - timedelta(days=6), 13, 5),
+                        (datetime.now().date() - timedelta(days=6), 1, 6)]
+
+        for user_id in range(1, 9):
+            user = User.objects.create(username=f"testuser-{user_id}")
+            streak = date_streaks[user_id - 1]
+            if not (streak is None):
+                day_start_row, max_days, days_in_row = streak
+                DatesInfoUser.objects.create(user=user, day_start_row=day_start_row, max_days=max_days,
+                                             days_in_row=days_in_row)
+            if user_id % 2:
+                tasks_instances[0].users_solved.add(user)
+            if user_id % 6:
+                tasks_instances[1].users_solved.add(user)
