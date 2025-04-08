@@ -1,13 +1,13 @@
 from django.contrib import admin
-from .models import Types, Tasks, CodePatterns
+from .models import Type, Task, ExamplesForTask
 
 
-@admin.register(CodePatterns)
+@admin.register(ExamplesForTask)
 class CodePatternsAdmin(admin.ModelAdmin):
     ordering = ('id',)
 
 
-@admin.register(Tasks)
+@admin.register(Task)
 class TasksAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'cat')
     list_display_links = ('id',)
@@ -18,7 +18,7 @@ class TasksAdmin(admin.ModelAdmin):
     list_filter = ['cat', ]
 
 
-@admin.register(Types)
+@admin.register(Type)
 class TasksAdmin(admin.ModelAdmin):
     list_display = ('id', 'catTask')
     list_display_links = ('catTask',)

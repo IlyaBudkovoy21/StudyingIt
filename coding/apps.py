@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class PersonalaccountConfig(AppConfig):
+class CodingConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'PersonalAccount'
+    name = 'coding'

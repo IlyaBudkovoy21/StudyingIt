@@ -12,7 +12,7 @@ from .models import CustomUser, DatesInfoUser
 from django.contrib.auth.models import User
 from .utility import get_user_id_by_access
 
-logger = logging.getLogger('PersonalAccount.views')
+logger = logging.getLogger('profile.views')
 
 
 class Registration(APIView):

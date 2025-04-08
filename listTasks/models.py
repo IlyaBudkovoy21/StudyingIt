@@ -16,24 +16,24 @@ class TasksMenuManager(models.Manager):
 
 
 # Models
-class Types(models.Model):
+class Type(models.Model):
     catTask = models.CharField(max_length=30, unique=True, verbose_name='Категория')
 
     def __str__(self):
         return self.catTask
 
 
-class Tasks(models.Model):
+class Task(models.Model):
     name = models.CharField(max_length=50, verbose_name='Имя задачки', unique=True)
     desc = models.TextField(max_length=1000)
-    cat = models.ForeignKey(Types, on_delete=models.CASCADE, blank=False, default=0, null=False)
+    cat = models.ForeignKey(Type, on_delete=models.CASCADE, blank=False, default=0, null=False)
     hash_name = models.SlugField(editable=False, null=False)
-    patterns = models.ForeignKey("CodePatterns", on_delete=models.CASCADE)
+    patterns = models.ForeignKey("ExamplesForTask", on_delete=models.CASCADE)
     first_test = models.TextField(blank=False, null=False)
     second_test = models.TextField(blank=False, null=False)
     third_test = models.TextField(blank=False, null=False)
     cost = models.IntegerField(default=0)
-    users_solved = models.ManyToManyField(to=User)
+    users_solved = models.ManyToManyField(to=User, db_table="SolvingTasksByUser")
     level = models.CharField(
         max_length=1,
         choices=[
@@ -43,6 +43,9 @@ class Tasks(models.Model):
         ],
         default='E'
     )
+
+    class Meta:
+        db_table = "Tasks"
 
     objects = models.Manager()
     tasks_menu = TasksMenuManager()
@@ -58,10 +61,13 @@ class Tasks(models.Model):
         db_table = "Tasks"
 
 
-class CodePatterns(models.Model):
+class ExamplesForTask(models.Model):
     python = models.TextField()
     cpp = models.TextField()
     go = models.TextField()
+
+    class Meta:
+        db_table = "ExamplesForTasks"
 
     def __str__(self):
         return "Patterns"

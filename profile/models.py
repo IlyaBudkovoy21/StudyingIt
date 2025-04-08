@@ -16,6 +16,6 @@ class DatesInfoUser(models.Model):
     max_days = models.IntegerField(default=0)
 
     class Meta:
-        db_table = "User_dates"
+        db_table = "UsersSolutionStreak"
         verbose_name = "Date information"
         verbose_name_plural = "Dates information"
