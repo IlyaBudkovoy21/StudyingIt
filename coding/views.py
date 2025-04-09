@@ -10,14 +10,13 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from django.db.transaction import atomic
-from django.core.exceptions import ObjectDoesNotExist
 
 from listTasks.models import Task
 from listTasks.serializers import TasksSerializer
 from .permissions import NotForUsers
 from profile.utility import get_user_id_by_access
-from django.contrib.auth.models import User
-from .services.user_data import update_solution_streak_info
+from .services.user_data import update_solution_streak_info, get_user
+from .services.tasks import get_task, get_task_by_hash, get_all_tasks
 
 log = logging.getLogger("coding.views")
 
@@ -30,10 +29,10 @@ class ReturnTask(generics.RetrieveAPIView):
     serializer_class = TasksSerializer
 
     def get_queryset(self):
-        return Task.objects.all()
+        return get_all_tasks()
 
     def get_object(self):
-        return self.get_queryset().get(hash_name=self.kwargs["name"])
+        return get_task_by_hash(self.kwargs["name"])
 
 
 class SaveCode(APIView):
@@ -73,6 +72,7 @@ def get_user(request, access_token):
     """
 
     user = get_user_id_by_access(access_token)
+
     if user["status"] == "OK":
         return Response({'user_id': user["data"]}, status=status.HTTP_200_OK)
     return Response({'error': user["error"]}, status=status.HTTP_400_BAD_REQUEST)
@@ -85,28 +85,6 @@ class CodeMonitoring(APIView):
     permission_classes = [NotForUsers]
     authentication_classes = []
 
-    @staticmethod
-    def get_user(user_id):
-        try:
-            return User.objects.get(id=user_id)
-        except ObjectDoesNotExist:
-            return None
-        except ValueError:
-            log.warning(f"Invalid user_id format: {user_id}")
-            return None
-
-    @staticmethod
-    def get_task(task_id):
-        try:
-            return Task.objects.only("id", "name").get(id=task_id)
-        except ObjectDoesNotExist:
-            return None
-        except ValueError:
-            log.warning(f"Invalid task_id format: {task_id}")
-            return None
-
-
-
     @atomic()
     def post(self, request):
 
@@ -117,8 +95,8 @@ class CodeMonitoring(APIView):
             log.error("Not enough information to save")
             return Response("Not enough information to save", status=status.HTTP_400_BAD_REQUEST)
 
-        user = CodeMonitoring.get_user(user_id)
-        task = CodeMonitoring.get_task(task_id)
+        user = get_user(user_id)
+        task = get_task(task_id)
         if user is None or task is None:
             log.error(f"User or task is not found: task - {task_id}, user - {user_id}")
             return Response(f"User or task is not found: task - {task_id}, user - {user_id}",

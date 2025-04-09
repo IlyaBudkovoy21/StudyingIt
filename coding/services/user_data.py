@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 from profile.models import DatesInfoUser
 from listTasks.models import Task
@@ -24,3 +25,13 @@ def update_solution_streak_info(user_id: int, user: User, task: Task) -> None:
 
     update_user_streak(info_user[0])
     task.users_solved.add(user)
+
+
+
+def get_user(user_id):
+    try:
+        return User.objects.get(id=user_id)
+    except ObjectDoesNotExist:
+        return None
+    except ValueError:
+        return None
