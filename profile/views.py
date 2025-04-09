@@ -1,37 +1,25 @@
+import logging
+
+from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import UserSerializer
 from rest_framework.permissions import IsAuthenticated
-
-import logging
 
 from .serializers import ProfileSerializer, TokenSerializer
 from .models import CustomUser, DatesInfoUser
-from django.contrib.auth.models import User
 from .utility import get_user_id_by_access
+from .services import registration_user, logout_user, return_user_data_for_profile
 
 logger = logging.getLogger('profile.views')
 
 
 class Registration(APIView):
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            refresh = RefreshToken.for_user(user)
-            refresh.payload.update({
-                "user_id": user.id,
-                "username": user.username
-            }
-            )
-            serialize = TokenSerializer({
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-            })
-            return Response(serialize.data, status=status.HTTP_201_CREATED)
-
+        token = registration_user(request.data)
+        if token:
+            return Response(token, status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_302_FOUND)
 
 
@@ -42,14 +30,14 @@ class Logout(APIView):
         refresh_token = request.data.get("refresh_token")
         if not refresh_token:
             return Response({"error": "Необходим refresh токен"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-        except Exception as e:
-            return Response({
-                "error": "Неверный refresh токен"
-            }, status=status.HTTP_400_BAD_REQUEST)
-        return Response({"success": "Успешный выход"}, status=status.HTTP_200_OK)
+
+        result_logout = logout_user(refresh_token)
+        if result_logout:
+            return Response({"success": "Успешный выход"}, status=status.HTTP_200_OK)
+        return Response({
+            "error": "Неверный refresh токен"
+        }, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class Profile(APIView):
@@ -61,18 +49,13 @@ class Profile(APIView):
         if token:
             user = get_user_id_by_access(token)
             if user["status"] == "OK":
-                id = user["data"]
-                try:
-                    user = User.objects.only("id", "username").get(id=id)
-                    user_info = DatesInfoUser.objects.defer("day_start_row").get(pk=user.id)
-                    solved_tasks = list(user.tasks_set.all().only("id", "level").values("id", "level"))
-                    serializer = ProfileSerializer({"username": user.username, "max_days": user_info.max_days,
-                                                    "current_days_row": user_info.days_in_row, "tasks": solved_tasks})
-                    return Response(serializer.data, status=status.HTTP_200_OK)
-                except Exception as e:
-                    logger.warning(e)
-                    return Response({"detail": "Failure when trying to get data from the database"},
-                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                user_id = user["data"]
+                info = return_user_data_for_profile(user_id)
+                if info:
+                    return Response(info, status=status.HTTP_200_OK)
+                logger.warning("Failure when trying to get data from the database")
+                return Response({"detail": "Failure when trying to get data from the database"},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 return Response(data={"detail": "Incorrect token processing"}, status=status.HTTP_401_UNAUTHORIZED)
         else:
