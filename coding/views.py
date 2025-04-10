@@ -11,7 +11,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from django.db.transaction import atomic
 
-from listTasks.models import Task
 from listTasks.serializers import TasksSerializer
 from .permissions import NotForUsers
 from profile.utility import get_user_id_by_access
@@ -66,7 +65,7 @@ class SaveCode(APIView):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_user(request, access_token):
+def get_user_by_token(request, access_token):
     """
     Returns the user by the passed token
     """
