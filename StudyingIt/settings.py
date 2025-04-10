@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    'drf_spectacular'
+    'debug_toolbar',
+    'drf_spectacular',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -63,6 +64,7 @@ MIDDLEWARE = [
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.cache.FetchFromCacheMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'StudyingIt.urls'
@@ -98,17 +100,9 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'PORT': os.getenv('PORT_DB'),
         'HOST': os.getenv('HOST_DB')
-    },
-    "test": {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test_db',
-        'USER': os.getenv('DB_USER_TEST'),
-        'PASSWORD': os.getenv('DB_PASSWORD_TEST'),
-        'PORT': os.getenv('TEST_PORT'),
-        'HOST': os.getenv('HOST_TEST')
     }
 }
-'''
+
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
@@ -118,7 +112,7 @@ CACHES = {
         }
     }
 }
-'''
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
