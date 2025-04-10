@@ -1,3 +1,8 @@
+import requests
+import logging
+from .s3 import client
+import botocore.exceptions
+
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -5,22 +10,15 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from django.db.transaction import atomic
-from django.core.exceptions import ObjectDoesNotExist
 
-import requests
-import logging
-from .s3 import client
-import botocore.exceptions
-from datetime import datetime, timedelta
-
-from listTasks.models import Tasks
+from listTasks.models import Task
 from listTasks.serializers import TasksSerializer
 from .permissions import NotForUsers
-from PersonalAccount.models import DatesInfoUser
-from PersonalAccount.utility import get_user_id_by_access
-from django.contrib.auth.models import User
+from profile.utility import get_user_id_by_access
+from .services.user_data import update_solution_streak_info, get_user
+from .services.tasks import get_task, get_task_by_hash, get_all_tasks
 
-log = logging.getLogger("Coding.views")
+log = logging.getLogger("coding.views")
 
 
 class ReturnTask(generics.RetrieveAPIView):
@@ -31,10 +29,10 @@ class ReturnTask(generics.RetrieveAPIView):
     serializer_class = TasksSerializer
 
     def get_queryset(self):
-        return Tasks.objects.all()
+        return get_all_tasks()
 
     def get_object(self):
-        return self.get_queryset().get(hash_name=self.kwargs["name"])
+        return get_task_by_hash(self.kwargs["name"])
 
 
 class SaveCode(APIView):
@@ -74,6 +72,7 @@ def get_user(request, access_token):
     """
 
     user = get_user_id_by_access(access_token)
+
     if user["status"] == "OK":
         return Response({'user_id': user["data"]}, status=status.HTTP_200_OK)
     return Response({'error': user["error"]}, status=status.HTTP_400_BAD_REQUEST)
@@ -90,38 +89,19 @@ class CodeMonitoring(APIView):
     def post(self, request):
 
         task_id = request.data.get("task_id", None)
-        id = request.data.get("id", None)
+        user_id = request.data.get("id", None)
 
-        if not (all((task_id, id))):
+        if not (all((task_id, user_id))):
             log.error("Not enough information to save")
             return Response("Not enough information to save", status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.get(id=id)
-        try:
-            info_user = DatesInfoUser.objects.get(
-                user__id=id)
-        except ObjectDoesNotExist as obj:
-            DatesInfoUser.objects.create(user=user)
+        user = get_user(user_id)
+        task = get_task(task_id)
+        if user is None or task is None:
+            log.error(f"User or task is not found: task - {task_id}, user - {user_id}")
+            return Response(f"User or task is not found: task - {task_id}, user - {user_id}",
+                            status=status.HTTP_404_NOT_FOUND)
 
-        task = Tasks.objects.only("id", "name").get(id=task_id)
+        update_solution_streak_info(user_id=user_id, user=user, task=task)
 
-        try:
-            if info_user.day_start_row and info_user.day_start_row + timedelta(
-                    days=info_user.days_in_row + 1) == datetime.now().date():
-                info_user.days_in_row += 1
-                info_user.max_days = max(info_user.max_days, info_user.days_in_row)
-            else:
-                info_user.days_in_row = 0
-                info_user.day_start_row = datetime.now().date()
-            info_user.save()
-        except Exception as e:
-            log.error("Unsuccess save solving dates")
-            return Response("Unsuccess save solving dates", status=status.HTTP_503_SERVICE_UNAVAILABLE)
-
-        try:
-            task.users_solved.add(user)
-        except Exception as e:
-            log.error("Unsuccess save user task")
-            return Response("Unsuccess save user task", status=status.HTTP_503_SERVICE_UNAVAILABLE)
-
-        return Response("Success date save", status=status.HTTP_200_OK)
+        return Response("Success data save", status=status.HTTP_200_OK)

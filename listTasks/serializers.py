@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Tasks, CodePatterns, Types
+from .models import Task, ExamplesForTask, Type
 
 from hashlib import sha224
 
@@ -12,7 +12,7 @@ class PatternSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        model = CodePatterns
+        model = ExamplesForTask
         fields = "__all__"
 
 
@@ -25,12 +25,12 @@ class TasksSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         patt = validated_data.pop("patterns")
         validated_data['hash_name'] = sha224(validated_data['name'].encode()).hexdigest()[:9]
-        a = CodePatterns.objects.create(**patt)
-        task = Tasks.objects.create(**validated_data, patterns=a)
+        a = ExamplesForTask.objects.create(**patt)
+        task = Task.objects.create(**validated_data, patterns=a)
         return task
 
     class Meta:
-        model = Tasks
+        model = Task
         fields = "__all__"
 
 
@@ -40,7 +40,7 @@ class TasksMenuSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        model = Tasks
+        model = Task
         fields = ["id", "name", "hash_name", "cost", "cat_id"]
 
 
@@ -51,4 +51,4 @@ class AllTypes(serializers.ModelSerializer):
 
     class Meta:
         fields = '__all__'
-        model = Types
+        model = Type

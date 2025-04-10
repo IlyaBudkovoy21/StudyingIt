@@ -39,13 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'Coding.apps.CodingConfig',
+    'coding.apps.CodingConfig',
     'listTasks',
-    'PersonalAccount.apps.PersonalaccountConfig',
+    'profile.apps.ProfileConfig',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    'debug_toolbar',
     'drf_spectacular'
 ]
 
@@ -64,7 +63,6 @@ MIDDLEWARE = [
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.cache.FetchFromCacheMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware"
 ]
 
 ROOT_URLCONF = 'StudyingIt.urls'
@@ -110,7 +108,7 @@ DATABASES = {
         'HOST': os.getenv('HOST_TEST')
     }
 }
-
+'''
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
@@ -120,7 +118,7 @@ CACHES = {
         }
     }
 }
-
+'''
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -144,19 +142,19 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGGING = {
     'version': 1,
     'loggers': {
-        'PersonalAccount.views': {
-            'handlers': ['personal_account.views'],
+        'profile.views': {
+            'handlers': ['profile.views'],
             'level': "WARNING",
         },
-        'Coding.permissions': {
+        'coding.permissions': {
             'handlers': ['coding.permissions'],
             'level': 'WARNING'
         },
-        'Coding.views': {
+        'coding.views': {
             'handlers': ['coding.views'],
             'level': 'INFO'
         },
-        "Coding.s3": {
+        "coding.s3": {
             "handlers": ["coding.s3"],
             "level": "WARNING"
         },
@@ -166,16 +164,16 @@ LOGGING = {
         }
     },
     'handlers': {
-        'personal_account.views': {
+        'profile.views': {
             'level': "WARNING",
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'PersonalAccount' / 'views.log',
+            'filename': BASE_DIR / 'logs' / 'profile' / 'views.log',
             'formatter': 'default'
         },
-        'personal_account.permissions': {
+        'profile.permissions': {
             'level': "WARNING",
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR / "logs" / "PersonalAccount" / "permissions.log",
+            'filename': BASE_DIR / "logs" / "profile" / "permissions.log",
             'formatter': 'default'
         },
         'listTasks.views': {
@@ -187,19 +185,19 @@ LOGGING = {
         'coding.permissions': {
             'level': "WARNING",
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR / "logs" / "Coding" / "permissions.log",
+            'filename': BASE_DIR / "logs" / "coding" / "permissions.log",
             'formatter': 'default'
         },
         'coding.views': {
             'level': 'WARNING',
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR / "logs" / "Coding" / "views.log",
+            'filename': BASE_DIR / "logs" / "coding" / "views.log",
             'formatter': 'default'
         },
         'coding.s3': {
             'level': 'WARNING',
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR / "logs" / "Coding" / "s3.log",
+            'filename': BASE_DIR / "logs" / "coding" / "s3.log",
             'formatter': 'default'
         }
     },

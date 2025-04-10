@@ -1,13 +1,11 @@
+import json
+
 from rest_framework import generics, viewsets, mixins
 from rest_framework.permissions import IsAdminUser, AllowAny
-from django.db.models import Q
-from rest_framework.response import Response
-from rest_framework.views import APIView
 
+from .services import return_task_by_one_cat, return_tasks_menu, return_many_cats, return_all_types, return_all_tasks
 from .serializers import TasksSerializer, TasksMenuSerializer, AllTypes
-from .models import Tasks, Types
-
-import json
+from .models import Task, Type
 
 
 class ListTasksByCat(generics.ListAPIView):
@@ -19,7 +17,7 @@ class ListTasksByCat(generics.ListAPIView):
 
     def get_queryset(self):
         cat = self.kwargs.get(self.lookup_url_kwarg)
-        return Tasks.tasks_menu.single_cat(cat)
+        return return_task_by_one_cat(cat)
 
 
 class TasksRetrieveListViewsSet(mixins.ListModelMixin,
@@ -29,7 +27,7 @@ class TasksRetrieveListViewsSet(mixins.ListModelMixin,
     View for menu of all tasks
     """
 
-    queryset = Tasks.tasks_menu.all()
+    queryset = return_tasks_menu()
     serializer_class = TasksMenuSerializer
     permission_classes = [AllowAny]
 
@@ -37,7 +35,7 @@ class TasksRetrieveListViewsSet(mixins.ListModelMixin,
 class CreateDestroyViewSet(mixins.CreateModelMixin,
                            mixins.DestroyModelMixin,
                            viewsets.GenericViewSet):
-    queryset = Tasks.objects.all()
+    queryset = return_all_tasks()
     serializer_class = TasksSerializer
     permission_classes = [IsAdminUser]
 
@@ -48,14 +46,7 @@ class FilterTasksByManyCats(generics.ListAPIView):
 
     def get_queryset(self):
         filter_param = self.request.GET.get("categories", None)
-        if not filter_param:
-            return Tasks.tasks_menu.all()
-
-        query = Q()
-        filter_param = json.loads(filter_param)
-        for cat in filter_param:
-            query |= Q(cat_id=cat)
-        return Tasks.tasks_menu.filter(query)
+        return return_many_cats(filter_param)
 
 
 class ReturnAllCategories(generics.ListAPIView):
@@ -64,4 +55,4 @@ class ReturnAllCategories(generics.ListAPIView):
     '''
 
     serializer_class = AllTypes
-    queryset = Types.objects.all()
+    queryset = return_all_types()

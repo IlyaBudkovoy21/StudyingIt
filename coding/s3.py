@@ -3,7 +3,7 @@ import logging
 
 from StudyingIt import settings
 
-log = logging.getLogger("Coding.s3")
+log = logging.getLogger("coding.s3")
 
 
 class ClientS3:

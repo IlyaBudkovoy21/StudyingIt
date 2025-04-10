@@ -4,7 +4,7 @@ import logging
 
 from StudyingIt.settings import SERVICES
 
-logger = logging.getLogger("Coding.permissions")
+logger = logging.getLogger("coding.permissions")
 
 
 class NotForUsers(BasePermission):
