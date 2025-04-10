@@ -7,7 +7,7 @@ from profile.models import DatesInfoUser
 from listTasks.models import Task, Type, ExamplesForTask
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(autouse=True, scope="session")
 @pytest.mark.django_db
 def create_db_data(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
@@ -97,7 +97,4 @@ def create_db_data(django_db_setup, django_db_blocker):
                 day_start_row, max_days, days_in_row = streak
                 DatesInfoUser.objects.create(user=user, day_start_row=day_start_row, max_days=max_days,
                                              days_in_row=days_in_row)
-            if user_id % 2:
-                tasks_instances[0].users_solved.add(user)
-            if user_id % 6:
-                tasks_instances[1].users_solved.add(user)
+
