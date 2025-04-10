@@ -20,7 +20,7 @@ class Registration(APIView):
         token = registration_user(request.data)
         if token:
             return Response(token, status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_302_FOUND)
+        return Response("Uncorrect data to registration user", status=status.HTTP_302_FOUND)
 
 
 class Logout(APIView):
@@ -29,14 +29,12 @@ class Logout(APIView):
     def post(self, request):
         refresh_token = request.data.get("refresh_token")
         if not refresh_token:
-            return Response({"error": "Необходим refresh токен"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response("Необходим refresh токен", status=status.HTTP_400_BAD_REQUEST)
 
         result_logout = logout_user(refresh_token)
         if result_logout:
-            return Response({"success": "Успешный выход"}, status=status.HTTP_200_OK)
-        return Response({
-            "error": "Неверный refresh токен"
-        }, status=status.HTTP_400_BAD_REQUEST)
+            return Response("Успешный выход", status=status.HTTP_200_OK)
+        return Response("Неверный refresh токен", status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -54,9 +52,9 @@ class Profile(APIView):
                 if info:
                     return Response(info, status=status.HTTP_200_OK)
                 logger.warning("Failure when trying to get data from the database")
-                return Response({"detail": "Failure when trying to get data from the database"},
+                return Response("Failure when trying to get data from the database",
                                 status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
-                return Response(data={"detail": "Incorrect token processing"}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(data="Incorrect token processing", status=status.HTTP_401_UNAUTHORIZED)
         else:
-            return Response(data={"detail": "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(data="Invalid token", status=status.HTTP_401_UNAUTHORIZED)
