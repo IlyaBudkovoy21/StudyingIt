@@ -5,8 +5,8 @@ from rest_framework import status
 import pytest
 from datetime import datetime, timedelta
 
-from PersonalAccount.models import DatesInfoUser
-from Coding.views import CodeMonitoring
+from profile.models import DatesInfoUser
+from coding.views import CodeMonitoring
 
 
 @pytest.mark.usefixtures("create_db_data")
@@ -44,7 +44,7 @@ class TestCodeMonitoring:
         assert response.status_code == exp_status
 
     @pytest.mark.parametrize(
-        "id, task_id, exp_data, exp_max_days, exp_days_row",
+        "user_id, task_id, exp_data, exp_max_days, exp_days_row",
         [
             [1, 1, datetime.now().date(), 1, 1],
             [2, 2, datetime.now().date(), 13, 1],
@@ -57,13 +57,13 @@ class TestCodeMonitoring:
         ]
     )
     @pytest.mark.django_db
-    def test_post_user_info(self, id, task_id, exp_data, exp_max_days, exp_days_row):
-        request = APIRequestFactory().post("/api/complete/", data={"id":id,
-                                                                   "task_id": task_id})
+    def test_post_user_info(self, user_id, task_id, exp_data, exp_max_days, exp_days_row):
+        request = APIRequestFactory().post("/api/complete/", data={"id":user_id,
+                                                                   "task_id": task_id}, format='json')
         CodeMonitoring.permission_classes = []
         CodeMonitoring.as_view()(request)
 
-        user = User.objects.get(id=id)
+        user = User.objects.get(id=user_id)
         dates = DatesInfoUser.objects.get(user=user)
 
         assert dates.day_start_row == exp_data

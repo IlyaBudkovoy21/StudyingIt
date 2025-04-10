@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 import pytest
 from datetime import datetime, timedelta
 
-from PersonalAccount.models import DatesInfoUser
-from listTasks.models import Tasks, Types, CodePatterns
+from profile.models import DatesInfoUser
+from listTasks.models import Task, Type, ExamplesForTask
 
 
 @pytest.fixture(scope="class")
@@ -19,7 +19,7 @@ def create_db_data(django_db_setup, django_db_blocker):
         ]
         types_instances = []
         for data in types_data:
-            types_instances.append(Types.objects.create(**data))
+            types_instances.append(Type.objects.create(**data))
 
         code_patterns_data = [
             {"python": "# Python pattern 1", "cpp": "// C++ pattern 1", "go": "// Go pattern 1"},
@@ -29,7 +29,7 @@ def create_db_data(django_db_setup, django_db_blocker):
         ]
         code_patterns_instances = []
         for data in code_patterns_data:
-            code_patterns_instances.append(CodePatterns.objects.create(**data))
+            code_patterns_instances.append(ExamplesForTask.objects.create(**data))
 
         tasks_data = [
             {
@@ -79,7 +79,7 @@ def create_db_data(django_db_setup, django_db_blocker):
         ]
         tasks_instances = []
         for data in tasks_data:
-            tasks_instances.append(Tasks.objects.create(**data))
+            tasks_instances.append(Task.objects.create(**data))
 
         date_streaks = [None,
                         (datetime(2023, 12, 31, 15, 30, 0), 13, 4),

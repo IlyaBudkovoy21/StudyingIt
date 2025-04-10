@@ -3,9 +3,11 @@ from django.contrib.auth.models import User
 import pytest
 from datetime import datetime, timedelta
 
-from listTasks.models import Tasks
-from Coding.views import CodeMonitoring
-from Coding.tests.unit_tests.mocks import MockDatesInfoUser
+from listTasks.models import Task
+from coding.views import CodeMonitoring
+from coding.tests.unit_tests.mocks import MockDatesInfoUser
+from coding.services.user_data import update_user_streak, get_user
+from coding.services.tasks import get_task
 
 
 class TestCodeMonitoring:
@@ -21,7 +23,7 @@ class TestCodeMonitoring:
     )
     def test_get_user(self, user_id, exp_result):
 
-        result = CodeMonitoring.get_user(user_id)
+        result = get_user(user_id)
 
         if exp_result is None:
             assert result is None
@@ -32,21 +34,21 @@ class TestCodeMonitoring:
     @pytest.mark.parametrize(
         "task_id, exp_result",
         [
-            (1, Tasks),
+            (1, Task),
             (10, None),
-            (7, Tasks),
+            (7, Task),
             (50, None),
             ("asdfasdf", None)
         ]
     )
     def test_get_task(self, task_id, exp_result):
 
-        result = CodeMonitoring.get_task(task_id)
+        result = get_task(task_id)
 
         if exp_result is None:
             assert result is None
         else:
-            assert isinstance(result, Tasks)
+            assert isinstance(result, Task)
             assert result.name == "testTaskName"
 
     @pytest.mark.parametrize(
@@ -76,7 +78,7 @@ class TestCodeMonitoring:
         test_info.max_days = max_days
         test_info.days_in_row = days_in_row
 
-        CodeMonitoring.update_user_streak(test_info)
+        update_user_streak(test_info)
 
         assert test_info.day_start_row == exp_data
         assert test_info.max_days == exp_max_days
