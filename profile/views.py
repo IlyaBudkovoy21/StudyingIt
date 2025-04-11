@@ -37,7 +37,6 @@ class Logout(APIView):
         return Response("Неверный refresh токен", status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class Profile(APIView):
     permission_classes = [IsAuthenticated]
 

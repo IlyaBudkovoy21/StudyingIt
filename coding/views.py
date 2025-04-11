@@ -1,8 +1,8 @@
 import requests
 import logging
-from .s3 import client
 import botocore.exceptions
 
+from django.http import Http404
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -31,36 +31,11 @@ class ReturnTask(generics.RetrieveAPIView):
         return get_all_tasks()
 
     def get_object(self):
-        return get_task_by_hash(self.kwargs["name"])
+        task = get_task_by_hash(self.kwargs["hash_name"])
+        if task is None:
+            raise Http404("Task not found")
+        return task
 
-
-class SaveCode(APIView):
-    """
-    View to save solutions
-    """
-
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        file = f'{request.data.get("username")}-test'
-        try:
-            client.upload_file(file, request.data.get("username"), request.data.get("code"),
-                               request.data.get("task_name"))
-        except botocore.exceptions.NoCredentialsError:
-            log.error(f"Ошибка отправки сообщения в S3 для пользователя {request.data.get("username")}")
-            raise Exception("Ошибка отправки сообщения")
-        cl = client.get_client()
-        response = requests.post("http://localhost:1234/code", json={
-            "path": f"{request.data.get("task_name")}-folder/{request.data.get("username")}-folder/{request.data.get("username")}-test",
-            "lang": request.data.get("lang"),
-            "task_name": request.data.get("task_name"),
-            "username": request.data.get("username")})
-        if response.status_code == 200:
-            return Response({"correct": "Success data transfer"}, status=status.HTTP_200_OK)
-        else:
-            log.error(f"{request.user}: Unsuccess data transfer")
-            return Response({"uncorrect": f"Unsuccess data transfer with status code -> {response.status_code}"},
-                            status=response.status_code)
 
 
 @api_view(['GET'])

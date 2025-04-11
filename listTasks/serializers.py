@@ -22,6 +22,7 @@ class TasksSerializer(serializers.ModelSerializer):
     """
     patterns = PatternSerializer()
 
+
     def create(self, validated_data):
         patt = validated_data.pop("patterns")
         validated_data['hash_name'] = sha224(validated_data['name'].encode()).hexdigest()[:9]
