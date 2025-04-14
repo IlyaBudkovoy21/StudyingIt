@@ -17,7 +17,8 @@ class NotForUsers(BasePermission):
     def has_permission(self, request, view):
         user_ip = request.META.get('HTTP_X_REAL_IP', None)
         if user_ip:
-            logger.warning(f"{user_ip} wants to get access, {SERVICES} only allows")
             if user_ip in SERVICES:
                 return True
+            logger.warning(f"{user_ip} wants to get access, {SERVICES} only allows")
             return False
+        return False

@@ -27,9 +27,6 @@ class ReturnTask(generics.RetrieveAPIView):
 
     serializer_class = TasksSerializer
 
-    def get_queryset(self):
-        return get_all_tasks()
-
     def get_object(self):
         task = get_task_by_hash(self.kwargs["hash_name"])
         if task is None:
