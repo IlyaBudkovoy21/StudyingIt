@@ -37,16 +37,17 @@ class ReturnTask(generics.RetrieveAPIView):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_user_by_token(request, access_token):
+def get_user_by_token(request):
     """
     Returns the user by the passed token
     """
+    token = request.auth.token
+    if not(token is None):
+        user = get_user_id_by_access(token)
 
-    user = get_user_id_by_access(access_token)
-
-    if user["status"] == "OK":
-        return Response({'user_id': user["data"]}, status=status.HTTP_200_OK)
-    return Response({'error': user["error"]}, status=status.HTTP_400_BAD_REQUEST)
+        if not(user is None):
+            return Response({'user_id': user}, status=status.HTTP_200_OK)
+    return Response({'error': "uncorrect token"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CodeMonitoring(APIView):

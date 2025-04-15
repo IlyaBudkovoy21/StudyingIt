@@ -63,7 +63,7 @@ class TestCodeMonitoring:
     @pytest.mark.django_db
     def test_post_user_info(self, user_id, task_id, exp_data, exp_max_days, exp_days_row):
         request = factory.post("/api/complete/", data={"id": user_id,
-                                                                   "task_id": task_id}, format='json')
+                                                       "task_id": task_id}, format='json')
         CodeMonitoring.permission_classes = []
         CodeMonitoring.as_view()(request)
 
@@ -86,14 +86,14 @@ class TestCodeMonitoring:
 @pytest.mark.django_db
 def test_get_user_by_token(username, password, exp_id):
     request_for_token = factory.post("/api/token/", data={"username": username,
-                                                                      "password": password}, format='json')
+                                                          "password": password}, format='json')
     response = TokenObtainPairView.as_view()(request_for_token).render()
 
     refresh = response.data.get("refresh", None)
     access = response.data.get("access", None)
 
-    request_test = factory.get(f"/api/code/auth/{access}/")
-    result = get_user_by_token(request_test, access_token=access)
+    request_test = factory.get(f"/api/code/auth/", headers={"Authorization": f"Bearer {access}"})
+    result = get_user_by_token(request_test)
 
     assert result.data.get("user_id", None) == exp_id
 
@@ -102,10 +102,10 @@ class TestReturnTask:
     @pytest.mark.parametrize(
         "hash_name, task_id, exp_status",
         (
-            ('563bf3a98', 1, status.HTTP_200_OK),
-            ('d19d0f9b7', 3, status.HTTP_200_OK),
-            ("894d741f9", 4, status.HTTP_200_OK),
-            ("failed_test", 1, status.HTTP_404_NOT_FOUND)
+                ('563bf3a98', 1, status.HTTP_200_OK),
+                ('d19d0f9b7', 3, status.HTTP_200_OK),
+                ("894d741f9", 4, status.HTTP_200_OK),
+                ("failed_test", 1, status.HTTP_404_NOT_FOUND)
         )
     )
     @pytest.mark.django_db
