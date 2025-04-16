@@ -91,7 +91,8 @@ def create_db_data(django_db_setup, django_db_blocker):
                         (datetime.now().date() - timedelta(days=6), 1, 6)]
 
         for user_id in range(1, 9):
-            user = User.objects.create_user(username=f"testuser-{user_id}", password=f"testuser-{user_id}-password")
+            is_staff = user_id == 1
+            user = User.objects.create_user(username=f"testuser-{user_id}", password=f"testuser-{user_id}-password", is_staff=is_staff)
             streak = date_streaks[user_id - 1]
             if not (streak is None):
                 day_start_row, max_days, days_in_row = streak
