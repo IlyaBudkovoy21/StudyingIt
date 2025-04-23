@@ -1,0 +1,22 @@
+networks:
+  dev:
+
+services:
+  web:
+    build: .
+    volumes:
+      - .:/back
+    ports:
+      - ${PORT_DB}
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    networks:
+      - dev
+  redis:
+    image: redis:latest
+    volumes:
+      - .:/back/cache
+    networks:
+      - dev

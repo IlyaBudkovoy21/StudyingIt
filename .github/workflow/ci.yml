@@ -1,0 +1,26 @@
+stages:
+  - build
+  - test
+
+build-job:
+  stage: build
+  script:
+      - |
+        cat << 'EOF' > .env
+        DB_USER=${{ secrets.DB_USER }}
+        DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+        HOST_DB=${{ secrets.HOST_DB }}
+        PORT_DB=${{ secrets.PORT_DB }}
+        SECRET_KEY=${{ secrets.SECRET_KEY }}
+        DOMAIN_API=${{ secrets.DOMAIN_API }}
+        EOF
+      - docker compose up -d
+   
+  
+
+
+test_job:
+  stage: test
+  script:
+    - docker compose exec web pytest
+  needs: ["build-job"]
