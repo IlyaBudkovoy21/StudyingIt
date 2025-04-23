@@ -11,8 +11,13 @@ def get_task(task_id: int):
     except ValueError:
         return None
 
-def get_task_by_hash(hash: str):
-    return Task.objects.get(hash_name=hash)
+def get_task_by_hash(hash_name: str):
+    try:
+        return Task.objects.get(hash_name=hash_name)
+    except ObjectDoesNotExist:
+        return None
+    except ValueError:
+        return None
 
 def get_all_tasks():
     return Task.objects.all()

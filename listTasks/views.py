@@ -12,6 +12,7 @@ class ListTasksByCat(generics.ListAPIView):
     """
     Class for view tasks by one category
     """
+
     serializer_class = TasksMenuSerializer
     lookup_url_kwarg = "cat"
 
@@ -30,14 +31,6 @@ class TasksRetrieveListViewsSet(mixins.ListModelMixin,
     queryset = return_tasks_menu()
     serializer_class = TasksMenuSerializer
     permission_classes = [AllowAny]
-
-
-class CreateDestroyViewSet(mixins.CreateModelMixin,
-                           mixins.DestroyModelMixin,
-                           viewsets.GenericViewSet):
-    queryset = return_all_tasks()
-    serializer_class = TasksSerializer
-    permission_classes = [IsAdminUser]
 
 
 class FilterTasksByManyCats(generics.ListAPIView):

@@ -1,7 +1,7 @@
+from hashlib import sha224
+
 from django.db import models
 from django.contrib.auth.models import User
-
-from hashlib import sha224
 
 
 # Manager's
