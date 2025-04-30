@@ -14,6 +14,15 @@ services:
     networks:
       - dev
 
+  comp:
+    image: killazius/code-verify:v1.4
+    ports:
+      - ${PORT_SERVICE}
+    environment:
+      CONFIG_PATH: "config/prod.yaml"
+    networks:
+      - dev
+
   redis:
     image: redis:alpine
     networks:
