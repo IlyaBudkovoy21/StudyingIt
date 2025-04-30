@@ -1,0 +1,30 @@
+networks:
+  dev:
+
+services:
+  web:
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgres
+    ports:
+      - "8000:8000"
+    networks:
+      - dev
+
+  redis:
+    image: redis:alpine
+    networks:
+      - dev
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+    networks:
+      - dev
+
+
